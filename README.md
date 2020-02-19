@@ -24,15 +24,9 @@ async def homepage(request):
 
 
 async def chatroom_ws(websocket):
-    await websocket.accept()
-
     async with broadcast.subscribe(group='chatroom', callback=handle_chat_event, args=(websocket,)):
-        try:
-            while True:
-                message = await websocket.receive_text()
-                await broadcast.publish(group='chatroom', message=message)
-        except WebSocketDisconnect:
-            await websocket.close()
+        async for message in websocket.iter_text()
+            await broadcast.publish(group='chatroom', message=message)
 
 
 async def handle_chat_event(event, websocket):
