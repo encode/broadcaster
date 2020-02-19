@@ -11,13 +11,13 @@ class BroadcastBackend:
     async def disconnect(self) -> None:
         raise NotImplementedError()
 
-    async def subscribe(self, group: str) -> None:
+    async def subscribe(self, channel: str) -> None:
         raise NotImplementedError()
 
-    async def unsubscribe(self, group: str) -> None:
+    async def unsubscribe(self, channel: str) -> None:
         raise NotImplementedError()
 
-    async def publish(self, group: str, message: typing.Any) -> None:
+    async def publish(self, channel: str, message: typing.Any) -> None:
         raise NotImplementedError()
 
     async def next_published(self) -> typing.Tuple[str, typing.Any]:

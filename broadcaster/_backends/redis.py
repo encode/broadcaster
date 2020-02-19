@@ -2,6 +2,7 @@ import asyncio_redis
 import typing
 from urllib.parse import urlparse
 from .base import BroadcastBackend
+from .._base import Event
 
 
 class RedisBackend(BroadcastBackend):
@@ -19,15 +20,15 @@ class RedisBackend(BroadcastBackend):
         self._pub_conn.close()
         self._sub_conn.close()
 
-    async def subscribe(self, group: str) -> None:
-        await self._subscriber.subscribe([group])
+    async def subscribe(self, channel: str) -> None:
+        await self._subscriber.subscribe([channel])
 
-    async def unsubscribe(self, group: str) -> None:
-        await self._subscriber.unsubscribe([group])
+    async def unsubscribe(self, channel: str) -> None:
+        await self._subscriber.unsubscribe([channel])
 
-    async def publish(self, group: str, message: typing.Any) -> None:
-        await self._pub_conn.publish(group, message)
+    async def publish(self, event: Event) -> None:
+        await self._pub_conn.publish(event.channel, event.message)
 
-    async def next_published(self) -> typing.Tuple[str, typing.Any]:
-        message = await self._subscriber.next_published()
-        return (message.channel, message.value)
+    async def next_published(self) -> Event:
+        item = await self._subscriber.next_published()
+        return Event(channel=item.channel, message=item.value)

@@ -1,19 +1,38 @@
 # Broadcaster
 
-Broadcaster provides an API around Redis PUB/SUB and Postgres LISTEN/NOTIFY to
-make developing realtime broadcast
+Broadcaster provides a simple API for broadcast notifications.
+
+*You'll need this if you want to implement realtime streaming services such
+as WebSocket based chat rooms.*
+
+The broadcaster package provides a consistent interface to a number of
+different broadcast services...
+
+* Local memory - `broadcaster.Broadcast('memory://')`
+* Redis PUB/SUB - `broadcaster.Broadcast('redis://localhost:6379')`
+* Postgres LISTEN/NOTIFY - `broadcaster.Broadcast('postgres://localhost:5432/database')`
+* Apache Kafka - `broadcaster.Broadcast('kafka://localhost:9092')`
+
+Some rules of thumb for choosing a backend:
+
+* Consider using a local memory backend for test and development environments.
+This backend won't communicate across multiple app instances, so isn't appropriate for
+production, but is useful for lightweight testing.
+* Redis PUB/SUB is a great all round option.
+* Postgres LISTEN/NOTIFY is useful if you're already using a Postgres database,
+and want to minimise the number of different services.
+* Apache Kafka is the most capable and consistent option for large-scale services.
 
 **app.py**
 
 ```python
-import subscribe
+from broadcaster import Broadcast, Event
 from starlette.applications import Starlette
 from starlette.routing import Route, WebSocketRoute
 from starlette.templating import Jinja2Templates
-from starlette.websockets import WebSocketDisconnect
 
 
-broadcast = subscribe.Broadcast('redis://localhost:6379')
+broadcast = Broadcast('redis://localhost:6379')
 templates = Jinja2Templates('templates')
 
 
@@ -24,20 +43,18 @@ async def homepage(request):
 
 
 async def chatroom_ws(websocket):
-    await websocket.accept()
-
-    async with broadcast.subscribe(group='chatroom', callback=handle_chat_event, args=(websocket,)):
-        try:
-            while True:
-                message = await websocket.receive_text()
-                await broadcast.publish(group='chatroom', message=message)
-        except WebSocketDisconnect:
-            await websocket.close()
+    async with broadcast.subscribe(
+        channel='chatroom',
+        callback=handle_chat_event,
+        args=(websocket,)
+    ):
+        async for message in websocket.iter_text():
+            event = Event(channel='chatroom', message=message)
+            await broadcast.publish(event)
 
 
 async def handle_chat_event(event, websocket):
-    channel, message = event
-    await websocket.send_text(message)
+    await websocket.send_text(event.message)
 
 
 routes = [

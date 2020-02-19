@@ -4,23 +4,42 @@ from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
 
+class Event:
+    def __init__(self, channel, message):
+        self.channel = channel
+        self.message = message
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, Event)
+            and self.channel == other.channel
+            and self.message == other.message
+        )
+
+    def __repr__(self):
+        return f'Event(channel={self.channel!r}, message={self.message!r})'
+
+
 class Broadcast:
     def __init__(self, url: str):
         parsed_url = urlparse(url)
         self._subscribers = {}
-        if parsed_url.scheme == 'redis':
+        if parsed_url.scheme == "redis":
             from ._backends.redis import RedisBackend
+
             self._backend = RedisBackend(url)
 
-        elif parsed_url.scheme in ('postgres', 'postgresql'):
+        elif parsed_url.scheme in ("postgres", "postgresql"):
             from ._backends.postgres import PostgresBackend
+
             self._backend = PostgresBackend(url)
 
-        elif parsed_url.scheme == 'memory':
+        elif parsed_url.scheme == "memory":
             from ._backends.memory import MemoryBackend
+
             self._backend = MemoryBackend(url)
 
-    async def __aenter__(self) -> 'Broadcast':
+    async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self
 
@@ -40,9 +59,9 @@ class Broadcast:
 
     async def _listener(self) -> None:
         while True:
-            group, message = await self._backend.next_published()
-            for subscriber in list(self._subscribers.get(group, [])):
-                await subscriber.put((group, message))
+            event = await self._backend.next_published()
+            for subscriber in list(self._subscribers.get(event.channel, [])):
+                await subscriber.put(event)
 
     async def _queue_listener(self, queue, callback, args=(), kwargs={}):
         while True:
@@ -51,29 +70,30 @@ class Broadcast:
                 break
             await callback(event, *args, **kwargs)
 
-    async def publish(self, group: str, message: typing.Any) -> None:
-        await self._backend.publish(group, message)
+    async def publish(self, event: Event) -> None:
+        await self._backend.publish(event)
 
     @asynccontextmanager
-    async def subscribe(self, group: str, callback: typing.Callable = None, args=(), kwargs={}) -> asyncio.Queue:
+    async def subscribe(
+        self, channel: str, callback: typing.Callable = None, args=(), kwargs={}
+    ) -> None:
         queue = asyncio.Queue()
-
         task = asyncio.create_task(self._queue_listener(queue, callback, args, kwargs))
 
         try:
-            if not self._subscribers.get(group):
-                await self._backend.subscribe(group)
-                self._subscribers[group] = set([queue])
+            if not self._subscribers.get(channel):
+                await self._backend.subscribe(channel)
+                self._subscribers[channel] = set([queue])
             else:
-                self._subscribers[group].add(queue)
+                self._subscribers[channel].add(queue)
 
-            yield queue
+            yield
 
-            await queue.put(None)
-            self._subscribers[group].remove(queue)
-            if not self._subscribers.get(group):
-                del self._subscribers[group]
-                await self._backend.unsubscribe(group)
+            self._subscribers[channel].remove(queue)
+            if not self._subscribers.get(channel):
+                del self._subscribers[channel]
+                await self._backend.unsubscribe(channel)
         finally:
+            await queue.put(None)
             await task
             task.result()
