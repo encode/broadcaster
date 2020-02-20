@@ -1,48 +1,33 @@
 import asyncio
-import subscribe
 import pytest
+from broadcaster import Broadcast
 
 
 @pytest.mark.asyncio
 async def test_memory():
-    events = []
-
-    async def handler(event):
-        events.append(event)
-
-    async with subscribe.Broadcast('memory://') as broadcast:
-        async with broadcast.subscribe('chatroom', callback=handler):
+    async with Broadcast('memory://') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
             await broadcast.publish('chatroom', 'hello')
-            await asyncio.sleep(0.1)
-
-    assert events == [('chatroom', 'hello')]
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
 
 
 @pytest.mark.asyncio
 async def test_redis():
-    events = []
-
-    async def handler(event):
-        events.append(event)
-
-    async with subscribe.Broadcast('redis://localhost:6379') as broadcast:
-        async with broadcast.subscribe('chatroom', callback=handler):
+    async with Broadcast('redis://localhost:6379') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
             await broadcast.publish('chatroom', 'hello')
-            await asyncio.sleep(0.1)
-
-    assert events == [('chatroom', 'hello')]
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
 
 
 @pytest.mark.asyncio
 async def test_postgres():
-    events = []
-
-    async def handler(event):
-        events.append(event)
-
-    async with subscribe.Broadcast('postgres://localhost:5432/hostedapi') as broadcast:
-        async with broadcast.subscribe('chatroom', callback=handler):
+    async with Broadcast('postgres://localhost:5432/hostedapi') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
             await broadcast.publish('chatroom', 'hello')
-            await asyncio.sleep(0.1)
-
-    assert events == [('chatroom', 'hello')]
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
