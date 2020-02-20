@@ -64,8 +64,8 @@ class Broadcast:
             for queue in list(self._subscribers.get(event.channel, [])):
                 await queue.put(event)
 
-    async def publish(self, group: str, message: typing.Any) -> None:
-        await self._backend.publish(group, message)
+    async def publish(self, channel: str, message: typing.Any) -> None:
+        await self._backend.publish(channel, message)
 
     @asynccontextmanager
     async def subscribe(self, channel: str) -> 'Subscriber':
@@ -92,7 +92,7 @@ class Subscriber:
     def __init__(self, queue):
         self._queue = queue
 
-    async def __iter__(self):
+    async def __aiter__(self):
         try:
             while True:
                 yield await self.get()
