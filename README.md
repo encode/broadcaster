@@ -66,7 +66,7 @@ app = Starlette(
 * `pip install broadcaster[redis]`
 * `pip install broadcaster[postgres]`
 
-## Available backends
+## Available backends
 
 * `Broadcast('memory://')`
 * `Broadcast("redis://localhost:6379")`
@@ -74,6 +74,13 @@ app = Starlette(
 
 ## Where next?
 
+At the moment `broadcaster` is in Alpha, and should be considered a working design document.
+
+The API should be considered subject to change. If you *do* want to use Broadcaster in its current
+state, make sure to strictly pin your requirements to `broadcaster==0.1.0`.
+
+To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
+
 * Serialization / deserialization to support broadcasting structured data.
 * Backends for Redis Streams, Apache Kafka, and RabbitMQ.
-* Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events.
+* Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
