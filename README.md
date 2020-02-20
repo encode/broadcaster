@@ -6,6 +6,8 @@ a simple broadcast API onto a number of different backend services.
 It currently supports Redis PUB/SUB, and Postgres LISTEN/NOTIFY, plus a simple
 in-memory backend, that you can use for local development or during testing.
 
+<img src="https://raw.githubusercontent.com/encode/broadcaster/master/docs/demo.gif" alt='WebSockets Demo'>
+
 Here's a complete example of the backend code for a simple websocket chat app:
 
 **app.py**
