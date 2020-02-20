@@ -89,3 +89,4 @@ To be more capable we'd really want to add some additional backends, provide API
 * Serialization / deserialization to support broadcasting structured data.
 * Backends for Redis Streams, Apache Kafka, and RabbitMQ.
 * Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
+* Support for pattern subscribes in backends that support it.
