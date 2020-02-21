@@ -6,8 +6,8 @@ from .._base import Event
 
 class MemoryBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self._subscribed = set()
-        self._published = asyncio.Queue()
+        self._subscribed: typing.Set = set()
+        self._published: asyncio.Queue = asyncio.Queue()
 
     async def connect(self) -> None:
         pass
