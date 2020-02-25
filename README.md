@@ -75,6 +75,7 @@ The HTML template for the front end [is available here](https://github.com/encod
 
 * `Broadcast('memory://')`
 * `Broadcast("redis://localhost:6379")`
+* `Broadcast("redis-stream://localhost:6379")`
 * `Broadcast("postgres://localhost:5432/hostedapi")`
 
 ## Where next?
@@ -87,6 +88,6 @@ state, make sure to strictly pin your requirements to `broadcaster==0.1.0`.
 To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
 
 * Serialization / deserialization to support broadcasting structured data.
-* Backends for Redis Streams, Apache Kafka, and RabbitMQ.
+* Backends for Apache Kafka, and RabbitMQ.
 * Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
 * Support for pattern subscribes in backends that support it.
