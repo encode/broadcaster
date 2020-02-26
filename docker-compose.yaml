@@ -1,0 +1,38 @@
+version: '3'
+services:
+  zookeeper:
+    image: "confluentinc/cp-zookeeper"
+    hostname: zookeeper
+    ports:
+      - 32181:32181
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=32181
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    ports:
+    - 9092:9092
+    - 29092:29092
+    depends_on:
+    - zookeeper
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:32181
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT_HOST://localhost:29092,PLAINTEXT://kafka:9092
+      - KAFKA_BROKER_ID=1
+      - ALLOW_PLAINTEXT_LISTENER=yes
+  redis:
+    image: "redis:alpine"
+    ports:
+      - 6379:6379
+  postgres:
+    image: "postgres:12"
+    environment:
+      - POSTGRES_DB=hostedapi
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=postgres
+    ports:
+      - 5432:5432

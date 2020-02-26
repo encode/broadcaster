@@ -1,0 +1,14 @@
+#!/bin/sh -e
+# Accepted values: postgres, kafka, redis
+# If no variable provided all services will start
+if [ -n "$1" ]; then
+    if [ "$1" != "kafka" ] && [ "$1" != "redis" ] && [ "$1" != "postgres" ]; then
+        echo  "Not a valid value. Choose one or none:
+    kafka
+    redis
+    postgres ";
+        exit 1;
+    fi
+fi
+
+docker-compose up $1

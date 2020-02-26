@@ -36,6 +36,10 @@ class Broadcast:
             from ._backends.postgres import PostgresBackend
             self._backend = PostgresBackend(url)
 
+        if parsed_url.scheme == 'kafka':
+            from ._backends.kafka import KafkaBackend
+            self._backend = KafkaBackend(url)
+
         elif parsed_url.scheme == 'memory':
             from ._backends.memory import MemoryBackend
             self._backend = MemoryBackend(url)
@@ -69,7 +73,7 @@ class Broadcast:
 
     @asynccontextmanager
     async def subscribe(self, channel: str) -> 'Subscriber':
-        queue = asyncio.Queue()
+        queue: asyncio.Queue = asyncio.Queue()
 
         try:
             if not self._subscribers.get(channel):

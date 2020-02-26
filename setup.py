@@ -51,6 +51,7 @@ setup(
     extras_require={
         "redis": ["asyncio-redis"],
         "postgres": ["asyncpg"],
+        "kafka": ["aiokafka"]
     },
     classifiers=[
         "Development Status :: 3 - Alpha",

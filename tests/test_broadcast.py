@@ -25,7 +25,17 @@ async def test_redis():
 
 @pytest.mark.asyncio
 async def test_postgres():
-    async with Broadcast('postgres://localhost:5432/hostedapi') as broadcast:
+    async with Broadcast('postgres://postgres:postgres@localhost:5432/hostedapi') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
+
+
+@pytest.mark.asyncio
+async def test_kafka():
+    async with Broadcast('kafka://localhost:9092') as broadcast:
         async with broadcast.subscribe('chatroom') as subscriber:
             await broadcast.publish('chatroom', 'hello')
             event = await subscriber.get()

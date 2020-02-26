@@ -1,12 +1,17 @@
-from broadcaster import Broadcast
+import os
+
+import uvicorn
 from starlette.applications import Starlette
 from starlette.concurrency import run_until_first_complete
 from starlette.routing import Route, WebSocketRoute
 from starlette.templating import Jinja2Templates
 
+from broadcaster import Broadcast
 
-broadcast = Broadcast("redis://localhost:6379")
-templates = Jinja2Templates("templates")
+BROADCAST_URL = os.environ.get("BROADCAST_URL", "memory://")
+
+broadcast = Broadcast(BROADCAST_URL)
+templates = Jinja2Templates("example/templates")
 
 
 async def homepage(request):
@@ -36,7 +41,7 @@ async def chatroom_ws_sender(websocket):
 
 routes = [
     Route("/", homepage),
-    WebSocketRoute("/", chatroom_ws, name='chatroom_ws'),
+    WebSocketRoute("/", chatroom_ws, name="chatroom_ws"),
 ]
 
 
