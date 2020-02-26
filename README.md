@@ -3,8 +3,7 @@
 Broadcaster helps you develop realtime streaming functionality in by providing
 a simple broadcast API onto a number of different backend services.
 
-It currently supports Redis PUB/SUB, and Postgres LISTEN/NOTIFY, plus a simple
-in-memory backend, that you can use for local development or during testing.
+It currently supports [Redis PUB/SUB](https://redis.io/topics/pubsub), [Apache Kafka](https://kafka.apache.org/), and [Postgres LISTEN/NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html), plus a simple in-memory backend, that you can use for local development or during testing.
 
 <img src="https://raw.githubusercontent.com/encode/broadcaster/master/docs/demo.gif" alt='WebSockets Demo'>
 
@@ -84,7 +83,7 @@ The HTML template for the front end [is available here](https://github.com/encod
 At the moment `broadcaster` is in Alpha, and should be considered a working design document.
 
 The API should be considered subject to change. If you *do* want to use Broadcaster in its current
-state, make sure to strictly pin your requirements to `broadcaster==0.1.0`.
+state, make sure to strictly pin your requirements to `broadcaster==0.2.0`.
 
 To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
 
