@@ -30,7 +30,7 @@ services:
   postgres:
     image: "postgres:12"
     environment:
-      - POSTGRES_DB=hostedapi
+      - POSTGRES_DB=broadcaster
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_USER=postgres
