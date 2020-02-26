@@ -1,7 +1,4 @@
 uvicorn
 starlette
 jinja2
-aiokafka
-asyncio-redis
-asyncpg
 broadcaster[redis,postgres,kafka]
