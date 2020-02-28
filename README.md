@@ -75,7 +75,7 @@ The HTML template for the front end [is available here](https://github.com/encod
 
 * `Broadcast('memory://')`
 * `Broadcast("redis://localhost:6379")`
-* `Broadcast("postgres://localhost:5432/hostedapi")`
+* `Broadcast("postgres://localhost:5432/broadcaster")`
 * `Broadcast("kafka://localhost:9092")`
 
 ## Where next?
