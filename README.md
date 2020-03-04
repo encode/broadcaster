@@ -61,7 +61,7 @@ app = Starlette(
 )
 ```
 
-The HTML template for the front end [is available here](https://github.com/encode/broadcaster/blob/master/templates/index.html), and is adapted from [Pieter Noordhuis's PUB/SUB demo](https://gist.github.com/pietern/348262).
+The HTML template for the front end [is available here](https://github.com/encode/broadcaster/blob/master/example/templates/index.html), and is adapted from [Pieter Noordhuis's PUB/SUB demo](https://gist.github.com/pietern/348262).
 
 
 ## Installation
