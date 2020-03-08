@@ -49,7 +49,7 @@ setup(
     # package_data={"starlette": ["py.typed"]},
     # data_files=[("", ["LICENSE.md"])],
     extras_require={
-        "redis": ["asyncio-redis"],
+        "redis": ["aioredis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"]
     },
