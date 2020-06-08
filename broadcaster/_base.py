@@ -53,7 +53,6 @@ class Broadcast:
 
     async def connect(self) -> None:
         await self._backend.connect()
-        self._listener_task = asyncio.create_task(self._listener())
 
     async def disconnect(self) -> None:
         if self._listener_task.done():
@@ -65,8 +64,9 @@ class Broadcast:
     async def _listener(self) -> None:
         while True:
             event = await self._backend.next_published()
-            for queue in list(self._subscribers.get(event.channel, [])):
-                await queue.put(event)
+            if event:
+                for queue in list(self._subscribers.get(event.channel, [])):
+                    await queue.put(event)
 
     async def publish(self, channel: str, message: typing.Any) -> None:
         await self._backend.publish(channel, message)
@@ -81,6 +81,7 @@ class Broadcast:
                 self._subscribers[channel] = set([queue])
             else:
                 self._subscribers[channel].add(queue)
+            self._listener_task = asyncio.create_task(self._listener())
 
             yield Subscriber(queue)
 
