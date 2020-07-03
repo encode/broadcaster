@@ -10,7 +10,7 @@ from .base import BroadcastBackend
 
 class KafkaBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self._servers = [urlparse(url).netloc]
+        self._servers = urlparse(url).netloc.split(',')
         self._consumer_channels: typing.Set = set()
 
     async def connect(self) -> None:
@@ -29,7 +29,7 @@ class KafkaBackend(BroadcastBackend):
         self._consumer.subscribe(topics=self._consumer_channels)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._consumer.unsubscribe()
+        self._consumer.unsubscribe()
 
     async def publish(self, channel: str, message: typing.Any) -> None:
         await self._producer.send_and_wait(channel, message.encode("utf8"))
