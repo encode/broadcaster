@@ -44,6 +44,12 @@ class Broadcast:
             from ._backends.memory import MemoryBackend
             self._backend = MemoryBackend(url)
 
+        elif parsed_url.scheme == 'gcloud-pubsub':
+            from ._backends.gcloud_pubsub import GCloudPubSubBackend
+            self._backend = GCloudPubSubBackend(
+                url.replace('gcloud-pubsub://', '')
+            )
+
     async def __aenter__(self) -> 'Broadcast':
         await self.connect()
         return self
