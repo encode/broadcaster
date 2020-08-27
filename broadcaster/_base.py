@@ -3,6 +3,8 @@ import typing
 from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
+import aioredis
+
 
 class Event:
     def __init__(self, channel, message):
@@ -63,10 +65,17 @@ class Broadcast:
         await self._backend.disconnect()
 
     async def _listener(self) -> None:
-        while True:
-            event = await self._backend.next_published()
-            for queue in list(self._subscribers.get(event.channel, [])):
-                await queue.put(event)
+        try:
+            while True:
+                event = await self._backend.next_published()
+                for queue in list(self._subscribers.get(event.channel, [])):
+                    await queue.put(event)
+        except asyncio.CancelledError:
+            raise
+        # for aioredis
+        except aioredis.ChannelClosedError:
+            pass
+
 
     async def publish(self, channel: str, message: typing.Any) -> None:
         await self._backend.publish(channel, message)
