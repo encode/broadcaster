@@ -47,9 +47,9 @@ setup(
     author_email="tom@tomchristie.com",
     packages=get_packages("broadcaster"),
     extras_require={
-        "redis": ["asyncio-redis"],
+        "redis": ["aioredis"],
         "postgres": ["asyncpg"],
-        "kafka": ["aiokafka"]
+        "kafka": ["aiokafka"],
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
