@@ -40,6 +40,10 @@ class Broadcast:
             from ._backends.kafka import KafkaBackend
             self._backend = KafkaBackend(url)
 
+        if parsed_url.scheme == "nats":
+            from ._backends.nats import NATSBackend
+            self._backend = NATSBackend(url)
+
         elif parsed_url.scheme == 'memory':
             from ._backends.memory import MemoryBackend
             self._backend = MemoryBackend(url)

@@ -1,4 +1,3 @@
-import asyncio
 import pytest
 from broadcaster import Broadcast
 
@@ -16,6 +15,16 @@ async def test_memory():
 @pytest.mark.asyncio
 async def test_redis():
     async with Broadcast('redis://localhost:6379') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
+
+
+@pytest.mark.asyncio
+async def test_nats():
+    async with Broadcast('nats://localhost:4222') as broadcast:
         async with broadcast.subscribe('chatroom') as subscriber:
             await broadcast.publish('chatroom', 'hello')
             event = await subscriber.get()
