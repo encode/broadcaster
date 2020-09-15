@@ -90,3 +90,38 @@ async def test_gcloud_pubsub_two_channels(pubsub_init):
                 assert event.message == 'hello'
                 assert event2.channel == 'chatroom2'
                 assert event2.message == 'hello2'
+
+
+@pytest.mark.asyncio
+async def test_gcloud_pubsub_consumer_wait_time_option(pubsub_init):
+    url = 'gcloud-pubsub://broadcaster-local?consumer_wait_time=0.1'
+    async with Broadcast(url) as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
+
+
+@pytest.mark.asyncio
+async def test_gcloud_pubsub_consumer_ack_consumed_messages_option(pubsub_init):
+    url = 'gcloud-pubsub://broadcaster-local/?ack_consumed_messages=0'
+    async with Broadcast(url) as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            event.context['ack_func']()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'
+
+
+@pytest.mark.asyncio
+async def test_gcloud_pubsub_consumer_wait_time_and_ack_consumed_messages_options(pubsub_init):
+    url = 'gcloud-pubsub://broadcaster-local?consumer_wait_time=0.1&ack_consumed_messages=0'
+    async with Broadcast(url) as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            event.context['ack_func']()
+            assert event.channel == 'chatroom'
+            assert event.message == 'hello'

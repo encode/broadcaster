@@ -1,13 +1,23 @@
 import asyncio
-import typing
+from typing import Any, Dict, Optional
 from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
 
 class Event:
-    def __init__(self, channel, message):
+    def __init__(
+        self,
+        channel: str,
+        message: Any,
+        context: Optional[Dict[str, Any]] = None
+    ):
         self.channel = channel
         self.message = message
+
+        if context is None:
+            context = {}
+
+        self.context = context
 
     def __eq__(self, other):
         return (
@@ -46,9 +56,7 @@ class Broadcast:
 
         elif parsed_url.scheme == 'gcloud-pubsub':
             from ._backends.gcloud_pubsub import GCloudPubSubBackend
-            self._backend = GCloudPubSubBackend(
-                url.replace('gcloud-pubsub://', '')
-            )
+            self._backend = GCloudPubSubBackend(url=url)
 
     async def __aenter__(self) -> 'Broadcast':
         await self.connect()
@@ -74,7 +82,7 @@ class Broadcast:
             for queue in list(self._subscribers.get(event.channel, [])):
                 await queue.put(event)
 
-    async def publish(self, channel: str, message: typing.Any) -> None:
+    async def publish(self, channel: str, message: Any) -> None:
         await self._backend.publish(channel, message)
 
     @asynccontextmanager
