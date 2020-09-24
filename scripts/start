@@ -2,11 +2,12 @@
 # Accepted values: postgres, kafka, redis
 # If no variable provided all services will start
 if [ -n "$1" ]; then
-    if [ "$1" != "kafka" ] && [ "$1" != "redis" ] && [ "$1" != "postgres" ]; then
+    if [ "$1" != "kafka" ] && [ "$1" != "redis" ] && [ "$1" != "postgres" ] && [ "$1" != "gcloud-pubsub" ]; then
         echo  "Not a valid value. Choose one or none:
     kafka
     redis
-    postgres ";
+    postgres
+    gcloud-pubsub ";
         exit 1;
     fi
 fi

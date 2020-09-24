@@ -36,3 +36,12 @@ services:
       - POSTGRES_USER=postgres
     ports:
       - 5432:5432
+  gcloud-pubsub:
+    image: google/cloud-sdk
+    entrypoint: |
+      gcloud beta emulators pubsub start
+      --data-dir=/root/
+      --host-port=0.0.0.0:8086
+      --project=broadcaster-local
+    ports:
+      - "8086:8086"
