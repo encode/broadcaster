@@ -9,7 +9,7 @@ from .._base import Event
 from .base import BroadcastBackend
 
 
-class GCloudPubSubBackend(BroadcastBackend):    
+class GCloudPubSubBackend(BroadcastBackend):
     def __init__(self, url: str):
         url_parsed = urlparse(url, scheme='gcloud-pubsub')
         self._project = url_parsed.netloc
