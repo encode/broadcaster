@@ -1,4 +1,4 @@
 uvicorn
 starlette
 jinja2
-broadcaster[redis,postgres,kafka]
+broadcaster[redis,postgres,kafka,mqtt]

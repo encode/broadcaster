@@ -41,3 +41,13 @@ async def test_kafka():
             event = await subscriber.get()
             assert event.channel == 'chatroom'
             assert event.message == 'hello'
+
+@pytest.mark.asyncio
+async def test_mqtt():
+    async with Broadcast('mqtt://localhost:1883') as broadcast:
+        async with broadcast.subscribe('chatroom') as subscriber:
+            await broadcast.publish('chatroom', 'hello')
+            event = await subscriber.get()
+            assert event.channel == 'chatroom'
+            assert event.message.decode('utf-8') == 'hello'
+
