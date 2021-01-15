@@ -3,7 +3,7 @@
 Broadcaster helps you develop realtime streaming functionality by providing
 a simple broadcast API onto a number of different backend services.
 
-It currently supports [Redis PUB/SUB](https://redis.io/topics/pubsub), [Apache Kafka](https://kafka.apache.org/), and [Postgres LISTEN/NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html), plus a simple in-memory backend, that you can use for local development or during testing.
+It currently supports [Redis PUB/SUB](https://redis.io/topics/pubsub), [Apache Kafka](https://kafka.apache.org/), and [Postgres LISTEN/NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html), [MQTT](https://mqtt.org/) plus a simple in-memory backend, that you can use for local development or during testing.
 
 <img src="https://raw.githubusercontent.com/encode/broadcaster/master/docs/demo.gif" alt='WebSockets Demo'>
 
@@ -78,6 +78,7 @@ Python 3.8+
 * `pip install broadcaster[redis]`
 * `pip install broadcaster[postgres]`
 * `pip install broadcaster[kafka]`
+* `pip install broadcaster[mqtt]`
 
 ## Available backends
 
@@ -85,6 +86,7 @@ Python 3.8+
 * `Broadcast("redis://localhost:6379")`
 * `Broadcast("postgres://localhost:5432/broadcaster")`
 * `Broadcast("kafka://localhost:9092")`
+* `Broadcast("mqtt://localhost:1883")`
 
 
 ### Using custom backends

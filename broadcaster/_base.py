@@ -52,6 +52,12 @@ class Broadcast:
             from broadcaster._backends.memory import MemoryBackend
 
             return MemoryBackend(url)
+
+        elif parsed_url.scheme in ("mqtt", "mqtts"):
+            from ._backends.mqtt import MqttBackend
+
+            return MqttBackend(url)
+
         raise ValueError(f"Unsupported backend: {parsed_url.scheme}")
 
     async def __aenter__(self) -> Broadcast:
