@@ -5,3 +5,6 @@ test.db
 .mypy_cache/
 starlette.egg-info/
 venv/
+broadcaster_noteable.egg-info/
+build/
+dist/
