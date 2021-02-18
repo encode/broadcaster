@@ -9,6 +9,8 @@
 Change from patch to minor or major for appropriate version updates in `broadcaster/__init__.py`, then push it to git.
 
 ```bash
+<edit init>
+git tag <init_version>
 git push upstream && git push upstream --tags
 ```
 
