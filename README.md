@@ -1,5 +1,7 @@
 # Broadcaster
 
+**Forked from original [broadcaster](https://github.com/encode/broadcaster) to get patch fixes available for re-use**
+
 Broadcaster helps you develop realtime streaming functionality by providing
 a simple broadcast API onto a number of different backend services.
 
