@@ -35,19 +35,18 @@ def get_packages(package):
 
 
 setup(
-    name="broadcaster",
+    name="broadcaster-noteable",
     python_requires=">=3.7",
     version=get_version("broadcaster"),
-    url="https://github.com/encode/broadcaster",
+    url="https://github.com/noteable-io/broadcaster",
     license="BSD",
     description="Simple broadcast channels.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    author="Tom Christie",
-    author_email="tom@tomchristie.com",
+    author="Noteable (extending from Tom Christie)",
     packages=get_packages("broadcaster"),
     extras_require={
-        "redis": ["asyncio-redis"],
+        "redis": ["aioredis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"]
     },

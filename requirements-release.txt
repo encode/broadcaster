@@ -1,0 +1,4 @@
+pip>=21.0.1
+wheel>=0.36.2
+setuptools>=51.1.0
+twine>=3.3.0

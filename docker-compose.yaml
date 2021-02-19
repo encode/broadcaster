@@ -36,3 +36,8 @@ services:
       - POSTGRES_USER=postgres
     ports:
       - 5432:5432
+  redis-pass:
+    image: "redis:alpine"
+    command: redis-server --requirepass 123
+    ports:
+      - 6377:6379
