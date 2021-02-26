@@ -36,3 +36,9 @@ services:
       - POSTGRES_USER=postgres
     ports:
       - 5432:5432
+  mqtt:
+    image: "eclipse-mosquitto"
+    hostname: mqtt
+    ports:
+      - 1883:1883
+      - 8883:8883
