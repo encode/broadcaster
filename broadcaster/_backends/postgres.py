@@ -7,10 +7,10 @@ from .._base import Event
 class PostgresBackend(BroadcastBackend):
     def __init__(self, url: str):
         self._url = url
-        self._listen_queue: asyncio.Queue = asyncio.Queue()
 
     async def connect(self) -> None:
         self._conn = await asyncpg.connect(self._url)
+        self._listen_queue: asyncio.Queue = asyncio.Queue()
 
     async def disconnect(self) -> None:
         await self._conn.close()
