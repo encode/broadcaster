@@ -46,6 +46,7 @@ setup(
     author="Tom Christie",
     author_email="tom@tomchristie.com",
     packages=get_packages("broadcaster"),
+    data_files=[("", ["LICENSE.md"])],
     extras_require={
         "redis": ["asyncio-redis"],
         "postgres": ["asyncpg"],
