@@ -17,7 +17,7 @@ class Event:
         )
 
     def __repr__(self):
-        return f'Event(channel={self.channel!r}, message={self.message!r})'
+        return f"Event(channel={self.channel!r}, message={self.message!r})"
 
 
 class Unsubscribed(Exception):
@@ -28,23 +28,27 @@ class Broadcast:
     def __init__(self, url: str):
         parsed_url = urlparse(url)
         self._subscribers = {}
-        if parsed_url.scheme == 'redis':
+        if parsed_url.scheme == "redis":
             from ._backends.redis import RedisBackend
+
             self._backend = RedisBackend(url)
 
-        elif parsed_url.scheme in ('postgres', 'postgresql'):
+        elif parsed_url.scheme in ("postgres", "postgresql"):
             from ._backends.postgres import PostgresBackend
+
             self._backend = PostgresBackend(url)
 
-        if parsed_url.scheme == 'kafka':
+        if parsed_url.scheme == "kafka":
             from ._backends.kafka import KafkaBackend
+
             self._backend = KafkaBackend(url)
 
-        elif parsed_url.scheme == 'memory':
+        elif parsed_url.scheme == "memory":
             from ._backends.memory import MemoryBackend
+
             self._backend = MemoryBackend(url)
 
-    async def __aenter__(self) -> 'Broadcast':
+    async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self
 
@@ -72,7 +76,7 @@ class Broadcast:
         await self._backend.publish(channel, message)
 
     @asynccontextmanager
-    async def subscribe(self, channel: str) -> 'Subscriber':
+    async def subscribe(self, channel: str) -> "Subscriber":
         queue: asyncio.Queue = asyncio.Queue()
 
         try:
