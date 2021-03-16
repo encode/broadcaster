@@ -1,9 +1,10 @@
 import asyncio
-import asyncpg
 from typing import Any
 
-from .base import BroadcastBackend
+import asyncpg
+
 from .._base import Event
+from .base import BroadcastBackend
 
 
 class PostgresBackend(BroadcastBackend):

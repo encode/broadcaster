@@ -1,7 +1,8 @@
 import asyncio
 import typing
-from .base import BroadcastBackend
+
 from .._base import Event
+from .base import BroadcastBackend
 
 
 class MemoryBackend(BroadcastBackend):

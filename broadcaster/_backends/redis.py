@@ -1,8 +1,10 @@
-import asyncio_redis
 import typing
 from urllib.parse import urlparse
-from .base import BroadcastBackend
+
+import asyncio_redis
+
 from .._base import Event
+from .base import BroadcastBackend
 
 
 class RedisBackend(BroadcastBackend):
