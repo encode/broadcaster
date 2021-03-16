@@ -1,5 +1,7 @@
 import asyncio
 import asyncpg
+from typing import Any
+
 from .base import BroadcastBackend
 from .._base import Event
 
@@ -24,7 +26,7 @@ class PostgresBackend(BroadcastBackend):
     async def publish(self, channel: str, message: str) -> None:
         await self._conn.execute("SELECT pg_notify($1, $2);", channel, message)
 
-    def _listener(self, *args) -> None:
+    def _listener(self, *args: Any) -> None:
         connection, pid, channel, payload = args
         event = Event(channel=channel, message=payload)
         self._listen_queue.put_nowait(event)
