@@ -1,0 +1,69 @@
+---
+name: Test Suite
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  tests:
+    name: "Python ${{ matrix.python-version }}"
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9"]
+
+    services:
+      zookeeper:
+        image: confluentinc/cp-zookeeper
+        ports:
+        - 32181:32181
+        env:
+          ZOOKEEPER_CLIENT_PORT: 32181
+          ALLOW_ANONYMOUS_LOGIN: yes
+        options: --hostname zookeeper
+      kafka:
+        image: confluentinc/cp-kafka
+        ports:
+        - 9092:9092
+        - 29092:29092
+        env:
+          KAFKA_ZOOKEEPER_CONNECT: "zookeeper:32181"
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+          KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT_HOST://localhost:29092,PLAINTEXT://localhost:9092"
+          KAFKA_BROKER_ID: 1
+          ALLOW_PLAINTEXT_LISTENER: yes
+        options: --hostname kafka
+      redis:
+        image: redis:alpine
+        ports:
+        - 6379:6379
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_DB: broadcaster
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_USER: postgres
+        ports:
+        - 5432:5432
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "${{ matrix.python-version }}"
+      - name: "Install dependencies"
+        run: "scripts/install"
+      - name: "Run linting checks"
+        run: "scripts/check"
+      - name: "Build package & docs"
+        run: "scripts/build"
+      - name: "Run tests"
+        run: "scripts/test"
+      - name: "Enforce coverage"
+        run: "scripts/coverage"
