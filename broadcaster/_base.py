@@ -1,23 +1,23 @@
 import asyncio
-import typing
 from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator, AsyncIterator, Dict, Optional
 from urllib.parse import urlparse
 
 
 class Event:
-    def __init__(self, channel, message):
+    def __init__(self, channel: str, message: str) -> None:
         self.channel = channel
         self.message = message
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             isinstance(other, Event)
             and self.channel == other.channel
             and self.message == other.message
         )
 
-    def __repr__(self):
-        return f'Event(channel={self.channel!r}, message={self.message!r})'
+    def __repr__(self) -> str:
+        return f"Event(channel={self.channel!r}, message={self.message!r})"
 
 
 class Unsubscribed(Exception):
@@ -26,29 +26,36 @@ class Unsubscribed(Exception):
 
 class Broadcast:
     def __init__(self, url: str):
+        from broadcaster._backends.base import BroadcastBackend
+
         parsed_url = urlparse(url)
-        self._subscribers = {}
-        if parsed_url.scheme == 'redis':
-            from ._backends.redis import RedisBackend
+        self._backend: BroadcastBackend
+        self._subscribers: Dict[str, Any] = {}
+        if parsed_url.scheme == "redis":
+            from broadcaster._backends.redis import RedisBackend
+
             self._backend = RedisBackend(url)
 
-        elif parsed_url.scheme in ('postgres', 'postgresql'):
-            from ._backends.postgres import PostgresBackend
+        elif parsed_url.scheme in ("postgres", "postgresql"):
+            from broadcaster._backends.postgres import PostgresBackend
+
             self._backend = PostgresBackend(url)
 
-        if parsed_url.scheme == 'kafka':
-            from ._backends.kafka import KafkaBackend
+        if parsed_url.scheme == "kafka":
+            from broadcaster._backends.kafka import KafkaBackend
+
             self._backend = KafkaBackend(url)
 
-        elif parsed_url.scheme == 'memory':
-            from ._backends.memory import MemoryBackend
+        elif parsed_url.scheme == "memory":
+            from broadcaster._backends.memory import MemoryBackend
+
             self._backend = MemoryBackend(url)
 
-    async def __aenter__(self) -> 'Broadcast':
+    async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self
 
-    async def __aexit__(self, *args, **kwargs) -> None:
+    async def __aexit__(self, *args: Any, **kwargs: Any) -> None:
         await self.disconnect()
 
     async def connect(self) -> None:
@@ -68,11 +75,11 @@ class Broadcast:
             for queue in list(self._subscribers.get(event.channel, [])):
                 await queue.put(event)
 
-    async def publish(self, channel: str, message: typing.Any) -> None:
+    async def publish(self, channel: str, message: Any) -> None:
         await self._backend.publish(channel, message)
 
     @asynccontextmanager
-    async def subscribe(self, channel: str) -> 'Subscriber':
+    async def subscribe(self, channel: str) -> AsyncIterator["Subscriber"]:
         queue: asyncio.Queue = asyncio.Queue()
 
         try:
@@ -93,10 +100,10 @@ class Broadcast:
 
 
 class Subscriber:
-    def __init__(self, queue):
+    def __init__(self, queue: asyncio.Queue) -> None:
         self._queue = queue
 
-    async def __aiter__(self):
+    async def __aiter__(self) -> Optional[AsyncGenerator]:
         try:
             while True:
                 yield await self.get()
