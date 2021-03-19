@@ -14,6 +14,7 @@ async def test_memory():
 
 
 @pytest.mark.asyncio
+@pytest.mark.redis
 async def test_redis():
     async with Broadcast("redis://localhost:6379") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
@@ -24,6 +25,7 @@ async def test_redis():
 
 
 @pytest.mark.asyncio
+@pytest.mark.postgres
 async def test_postgres():
     async with Broadcast(
         "postgres://postgres:postgres@localhost:5432/broadcaster"
@@ -36,6 +38,7 @@ async def test_postgres():
 
 
 @pytest.mark.asyncio
+@pytest.mark.kafka
 async def test_kafka():
     async with Broadcast("kafka://localhost:9092") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
