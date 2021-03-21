@@ -43,7 +43,7 @@ async def test_kafka():
     async with Broadcast("kafka://localhost:9092") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
-            raise Exception("HERE")
             event = await subscriber.get()
             assert event.channel == "chatroom"
             assert event.message == "hello"
+            raise Exception("HERE")
