@@ -23,7 +23,6 @@ async def test_redis():
             assert event.message == "hello"
 
 
-@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_postgres():
     async with Broadcast(
