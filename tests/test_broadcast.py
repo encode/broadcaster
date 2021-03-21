@@ -13,6 +13,7 @@ async def test_memory():
             assert event.channel == "chatroom"
             assert event.message == "hello"
 
+
 @pytest.mark.skip
 @pytest.mark.asyncio
 async def test_redis():
@@ -22,6 +23,7 @@ async def test_redis():
             event = await subscriber.get()
             assert event.channel == "chatroom"
             assert event.message == "hello"
+
 
 @pytest.mark.skip
 @pytest.mark.asyncio
