@@ -13,7 +13,6 @@ async def test_memory():
             assert event.message == "hello"
 
 
-@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_redis():
     async with Broadcast("redis://localhost:6379") as broadcast:
