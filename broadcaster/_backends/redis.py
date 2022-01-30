@@ -28,8 +28,8 @@ class RedisBackend(BroadcastBackend):
     async def unsubscribe(self, channel: str) -> None:
         await self._subscriber.unsubscribe([channel])
 
-    async def publish(self, channel: str, message: typing.Any) -> None:
-        await self._pub_conn.publish(channel, message)
+    async def publish(self, channel: str, message: typing.Any) -> int:
+        return await self._pub_conn.publish(channel, message)
 
     async def next_published(self) -> Event:
         message = await self._subscriber.next_published()
