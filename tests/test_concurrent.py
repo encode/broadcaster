@@ -1,6 +1,10 @@
+"""Check for #22"""
+import asyncio
 from uuid import uuid4
 
 import pytest
+
+MESSAGES = ["hello", "goodbye"]
 
 URLS = [
     ("memory://",),
@@ -15,9 +19,12 @@ URLS = [
 async def test_broadcast(setup_broadcast):
     uid = uuid4()
     channel = f"chatroom-{uid}"
-    msg = f"hello {uid}"
+    msgs = [f"{msg} {uid}" for msg in MESSAGES]
     async with setup_broadcast.subscribe(channel) as subscriber:
-        await setup_broadcast.publish(channel, msg)
-        event = await subscriber.get()
-        assert event.channel == channel
-        assert event.message == msg
+        to_publish = [setup_broadcast.publish(channel, msg) for msg in msgs]
+
+        await asyncio.gather(*to_publish)
+        for msg in msgs:
+            event = await subscriber.get()
+            assert event.channel == channel
+            assert event.message == msg
