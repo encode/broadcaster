@@ -1,16 +1,15 @@
 from __future__ import annotations
 
+import pytest
 import asyncio
 import typing
-
-import pytest
 
 from broadcaster import Broadcast, BroadcastBackend, Event
 from broadcaster._backends.kafka import KafkaBackend
 
 
 class CustomBackend(BroadcastBackend):
-    def __init__(self, url: str):
+    def __init__(self, url: str) -> None:
         self._subscribed: set[str] = set()
 
     async def connect(self) -> None:
