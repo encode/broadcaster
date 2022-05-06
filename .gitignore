@@ -3,5 +3,7 @@ test.db
 .coverage
 .pytest_cache/
 .mypy_cache/
-starlette.egg-info/
+broadcaster.egg-info/
 venv/
+build/
+dist/
