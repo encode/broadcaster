@@ -1,4 +1,5 @@
 """Check for #22"""
+
 import asyncio
 from uuid import uuid4
 
