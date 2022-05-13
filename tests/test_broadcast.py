@@ -1,45 +1,23 @@
+from uuid import uuid4
+
 import pytest
 
-from broadcaster import Broadcast
+URLS = [
+    ("memory://",),
+    ("redis://localhost:6379",),
+    ("postgres://postgres:postgres@localhost:5432/broadcaster",),
+    ("kafka://localhost:9092",),
+]
 
 
 @pytest.mark.asyncio
-async def test_memory():
-    async with Broadcast("memory://") as broadcast:
-        async with broadcast.subscribe("chatroom") as subscriber:
-            await broadcast.publish("chatroom", "hello")
-            event = await subscriber.get()
-            assert event.channel == "chatroom"
-            assert event.message == "hello"
-
-
-@pytest.mark.asyncio
-async def test_redis():
-    async with Broadcast("redis://localhost:6379") as broadcast:
-        async with broadcast.subscribe("chatroom") as subscriber:
-            await broadcast.publish("chatroom", "hello")
-            event = await subscriber.get()
-            assert event.channel == "chatroom"
-            assert event.message == "hello"
-
-
-@pytest.mark.asyncio
-async def test_postgres():
-    async with Broadcast(
-        "postgres://postgres:postgres@localhost:5432/broadcaster"
-    ) as broadcast:
-        async with broadcast.subscribe("chatroom") as subscriber:
-            await broadcast.publish("chatroom", "hello")
-            event = await subscriber.get()
-            assert event.channel == "chatroom"
-            assert event.message == "hello"
-
-
-@pytest.mark.asyncio
-async def test_kafka():
-    async with Broadcast("kafka://localhost:9092") as broadcast:
-        async with broadcast.subscribe("chatroom") as subscriber:
-            await broadcast.publish("chatroom", "hello")
-            event = await subscriber.get()
-            assert event.channel == "chatroom"
-            assert event.message == "hello"
+@pytest.mark.parametrize(["setup_broadcast"], URLS, indirect=True)
+async def test_broadcast(setup_broadcast):
+    uid = uuid4()
+    channel = f"chatroom-{uid}"
+    msg = f"hello {uid}"
+    async with setup_broadcast.subscribe(channel) as subscriber:
+        await setup_broadcast.publish(channel, msg)
+        event = await subscriber.get()
+        assert event.channel == channel
+        assert event.message == msg

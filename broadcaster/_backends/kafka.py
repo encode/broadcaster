@@ -1,4 +1,3 @@
-import asyncio
 import typing
 from urllib.parse import urlparse
 
@@ -14,9 +13,8 @@ class KafkaBackend(BroadcastBackend):
         self._consumer_channels: typing.Set = set()
 
     async def connect(self) -> None:
-        loop = asyncio.get_event_loop()
-        self._producer = AIOKafkaProducer(loop=loop, bootstrap_servers=self._servers)
-        self._consumer = AIOKafkaConsumer(loop=loop, bootstrap_servers=self._servers)
+        self._producer = AIOKafkaProducer(bootstrap_servers=self._servers)
+        self._consumer = AIOKafkaConsumer(bootstrap_servers=self._servers)
         await self._producer.start()
         await self._consumer.start()
 
@@ -29,7 +27,7 @@ class KafkaBackend(BroadcastBackend):
         self._consumer.subscribe(topics=self._consumer_channels)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._consumer.unsubscribe()
+        self._consumer.unsubscribe()
 
     async def publish(self, channel: str, message: typing.Any) -> None:
         await self._producer.send_and_wait(channel, message.encode("utf8"))

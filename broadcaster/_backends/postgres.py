@@ -13,19 +13,23 @@ class PostgresBackend(BroadcastBackend):
 
     async def connect(self) -> None:
         self._conn = await asyncpg.connect(self._url)
+        self._lock = asyncio.Lock()
         self._listen_queue: asyncio.Queue = asyncio.Queue()
 
     async def disconnect(self) -> None:
         await self._conn.close()
 
     async def subscribe(self, channel: str) -> None:
-        await self._conn.add_listener(channel, self._listener)
+        async with self._lock:
+            await self._conn.add_listener(channel, self._listener)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._conn.remove_listener(channel, self._listener)
+        async with self._lock:
+            await self._conn.remove_listener(channel, self._listener)
 
     async def publish(self, channel: str, message: str) -> None:
-        await self._conn.execute("SELECT pg_notify($1, $2);", channel, message)
+        async with self._lock:
+            await self._conn.execute("SELECT pg_notify($1, $2);", channel, message)
 
     def _listener(self, *args: Any) -> None:
         connection, pid, channel, payload = args
