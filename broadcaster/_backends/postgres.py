@@ -14,6 +14,7 @@ class PostgresBackend(BroadcastBackend):
     async def connect(self) -> None:
         self._conn = await asyncpg.connect(self._url)
         self._listen_queue: asyncio.Queue[Event] = asyncio.Queue()
+        self._conn.add_termination_listener(self._termination_listener)
 
     async def disconnect(self) -> None:
         await self._conn.close()
@@ -27,10 +28,13 @@ class PostgresBackend(BroadcastBackend):
     async def publish(self, channel: str, message: str) -> None:
         await self._conn.execute("SELECT pg_notify($1, $2);", channel, message)
 
-    def _listener(self, *args: Any) -> None:
+    async def _listener(self, *args: Any) -> None:
         connection, pid, channel, payload = args
         event = Event(channel=channel, message=payload)
-        self._listen_queue.put_nowait(event)
+        await self._listen_queue.put(event)
+
+    async def _termination_listener(self, *args: Any) -> None:
+        await self._listen_queue.put(None)
 
     async def next_published(self) -> Event:
         return await self._listen_queue.get()
