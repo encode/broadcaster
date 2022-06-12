@@ -73,10 +73,10 @@ Python 3.7+
 
 ## Installation
 
-* `pip install broadcaster`
-* `pip install broadcaster[redis]`
-* `pip install broadcaster[postgres]`
-* `pip install broadcaster[kafka]`
+* `pip install permit-broadcaster`
+* `pip install permit-broadcaster[redis]`
+* `pip install permit-broadcaster[postgres]`
+* `pip install permit-broadcaster[kafka]`
 
 ## Available backends
 
