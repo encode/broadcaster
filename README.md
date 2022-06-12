@@ -1,4 +1,8 @@
-# Broadcaster
+# Broadcaster (Permit fork)
+
+This is a fork of [encode/broadcaster](https://github.com/encode/broadcaster).
+
+----
 
 Broadcaster helps you develop realtime streaming functionality by providing
 a simple broadcast API onto a number of different backend services.
