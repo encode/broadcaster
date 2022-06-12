@@ -35,12 +35,12 @@ def get_packages(package):
 
 
 setup(
-    name="broadcaster",
+    name="permit-broadcaster",
     python_requires=">=3.7",
     version=get_version("broadcaster"),
-    url="https://github.com/encode/broadcaster",
+    url="https://github.com/permitio/broadcaster",
     license="BSD",
-    description="Simple broadcast channels.",
+    description="Simple broadcast channels (Permit fork)",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     author="Tom Christie",
