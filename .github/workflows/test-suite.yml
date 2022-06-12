@@ -6,6 +6,7 @@ on:
     branches: ["master"]
   pull_request:
     branches: ["master"]
+  workflow_dispatch:
 
 jobs:
   tests:
@@ -20,7 +21,7 @@ jobs:
       zookeeper:
         image: confluentinc/cp-zookeeper
         ports:
-        - 32181:32181
+          - 32181:32181
         env:
           ZOOKEEPER_CLIENT_PORT: 32181
           ALLOW_ANONYMOUS_LOGIN: yes
@@ -28,8 +29,8 @@ jobs:
       kafka:
         image: confluentinc/cp-kafka
         ports:
-        - 9092:9092
-        - 29092:29092
+          - 9092:9092
+          - 29092:29092
         env:
           KAFKA_ZOOKEEPER_CONNECT: "zookeeper:32181"
           KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -41,7 +42,7 @@ jobs:
       redis:
         image: redis:alpine
         ports:
-        - 6379:6379
+          - 6379:6379
       postgres:
         image: postgres:12
         env:
@@ -50,7 +51,7 @@ jobs:
           POSTGRES_HOST_AUTH_METHOD: trust
           POSTGRES_USER: postgres
         ports:
-        - 5432:5432
+          - 5432:5432
 
     steps:
       - uses: "actions/checkout@v2"
