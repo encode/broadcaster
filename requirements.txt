@@ -12,13 +12,13 @@ wheel
 # Tests & Linting
 autoflake
 black==22.6.0
-coverage==5.3
+coverage
 flake8
 flake8-bugbear
 flake8-pie==0.5.*
 isort==5.*
 mypy
-pytest==5.*
+pytest
 pytest-asyncio
 pytest-trio
 trio
