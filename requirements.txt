@@ -1,25 +1,22 @@
 -e .[redis,postgres,kafka]
 
 # Documentation
-mkdocs
-mkautodoc
-mkdocs-material
+mkdocs==1.3.1
+mkautodoc==0.2.0
+mkdocs-material==8.4.0
 
 # Packaging
-twine
-wheel
+twine==4.0.1
+wheel==0.37.1
 
 # Tests & Linting
-autoflake
-black==20.8b1
-coverage==5.3
-flake8
-flake8-bugbear
-flake8-pie==0.5.*
-isort==5.*
-mypy
-pytest==5.*
-pytest-asyncio
-pytest-trio
-trio
-trio-typing
+autoflake==1.4
+black==22.6.0
+coverage==6.4.4
+flake8==3.9.2
+flake8-bugbear==22.7.1
+flake8-pie==0.16.0
+isort==5.10.1
+mypy==0.971
+pytest==7.1.2
+pytest-asyncio==0.19.0
