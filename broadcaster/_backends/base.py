@@ -1,8 +1,10 @@
-import typing
+from typing import Any
+
+from .._base import Event
 
 
 class BroadcastBackend:
-    def __init__(self, url):
+    def __init__(self, url: str) -> None:
         raise NotImplementedError()
 
     async def connect(self) -> None:
@@ -17,8 +19,8 @@ class BroadcastBackend:
     async def unsubscribe(self, group: str) -> None:
         raise NotImplementedError()
 
-    async def publish(self, channel: str, message: typing.Any) -> None:
+    async def publish(self, channel: str, message: Any) -> None:
         raise NotImplementedError()
 
-    async def next_published(self) -> typing.Tuple[str, typing.Any]:
+    async def next_published(self) -> Event:
         raise NotImplementedError()

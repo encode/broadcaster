@@ -1,16 +1,16 @@
 import asyncio
 import typing
-from .base import BroadcastBackend
+
 from .._base import Event
+from .base import BroadcastBackend
 
 
 class MemoryBackend(BroadcastBackend):
     def __init__(self, url: str):
         self._subscribed: typing.Set = set()
-        self._published: asyncio.Queue = asyncio.Queue()
 
     async def connect(self) -> None:
-        pass
+        self._published: asyncio.Queue = asyncio.Queue()
 
     async def disconnect(self) -> None:
         pass

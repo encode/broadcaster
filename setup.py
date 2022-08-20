@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
 import re
 
@@ -46,11 +43,14 @@ setup(
     author="Tom Christie",
     author_email="tom@tomchristie.com",
     packages=get_packages("broadcaster"),
+    package_data={"broadcaster": ["py.typed"]},
+    include_package_data=True,
     extras_require={
         "redis": ["asyncio-redis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"],
         "mqtt": ["asyncio-mqtt"]
+        "test": ["pytest", "pytest-asyncio"],
     },
     classifiers=[
         "Development Status :: 3 - Alpha",
@@ -62,6 +62,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
-    # zip_safe=False,
 )
