@@ -3,7 +3,7 @@ import typing
 from urllib.parse import urlparse
 from .base import BroadcastBackend
 from .._base import Event
-from contextlib import AsyncExitStack, asynccontextmanager
+from contextlib import AsyncExitStack
 
 
 class MqttBackend(BroadcastBackend):
