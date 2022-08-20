@@ -49,7 +49,7 @@ setup(
         "redis": ["asyncio-redis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"],
-        "mqtt": ["asyncio-mqtt"]
+        "mqtt": ["asyncio-mqtt"],
         "test": ["pytest", "pytest-asyncio"],
     },
     classifiers=[
