@@ -5,6 +5,7 @@ from .base import BroadcastBackend
 from .._base import Event
 from contextlib import AsyncExitStack, asynccontextmanager
 
+
 class MqttBackend(BroadcastBackend):
     def __init__(self, url: str):
         parsed_url = urlparse(url)
@@ -36,4 +37,3 @@ class MqttBackend(BroadcastBackend):
     async def next_published(self) -> Event:
         async for message in self.messages:
             return Event(channel=message.topic, message=message.payload)
-
