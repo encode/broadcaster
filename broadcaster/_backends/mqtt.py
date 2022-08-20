@@ -9,14 +9,14 @@ class MqttBackend(BroadcastBackend):
     def __init__(self, url: str):
         parsed_url = urlparse(url)
         self._host = parsed_url.hostname or "localhost"
-        self._port = 8883 if parsed_url.scheme == 'mqtts' else 1883
+        self._port = 8883 if parsed_url.scheme == "mqtts" else 1883
         self._port = parsed_url.port or self._port
 
     async def connect(self) -> None:
         self.stack = AsyncExitStack()
 
         self.client = asyncio_mqtt.Client(self._host, port=self._port)
-        self.messages = self.client.filtered_messages('#')
+        self.messages = self.client.filtered_messages("#")
 
         self.client = await self.stack.enter_async_context(self.client)
         self.messages = await self.stack.enter_async_context(self.messages)
