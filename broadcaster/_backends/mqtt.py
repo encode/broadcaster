@@ -8,6 +8,7 @@ from .._base import Event
 from .base import BroadcastBackend
 
 
+
 class MqttBackend(BroadcastBackend):
     def __init__(self, url: str):
         parsed_url = urlparse(url)
