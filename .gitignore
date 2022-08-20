@@ -5,3 +5,5 @@ test.db
 .mypy_cache/
 *.egg-info/
 venv/
+build/
+dist/
