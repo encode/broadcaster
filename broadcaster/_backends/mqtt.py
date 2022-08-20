@@ -1,9 +1,11 @@
-import asyncio_mqtt
 import typing
-from urllib.parse import urlparse
-from .base import BroadcastBackend
-from .._base import Event
 from contextlib import AsyncExitStack
+from urllib.parse import urlparse
+
+import asyncio_mqtt
+
+from .._base import Event
+from .base import BroadcastBackend
 
 
 class MqttBackend(BroadcastBackend):
