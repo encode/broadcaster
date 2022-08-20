@@ -36,4 +36,7 @@ class MqttBackend(BroadcastBackend):
 
     async def next_published(self) -> Event:
         async for message in self.messages:
-            return Event(channel=message.topic, message=message.payload)
+            event = Event(channel=message.topic, message=message.payload)
+            break
+
+        return event
