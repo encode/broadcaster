@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+export PREFIX=""
+if [ -d 'venv' ]; then
+    export PREFIX="venv/bin/"
+fi
+export SOURCE_FILES="broadcaster tests"
+
+set -x
+
+${PREFIX}autoflake --in-place --recursive $SOURCE_FILES
+${PREFIX}isort --project=broadcaster $SOURCE_FILES
+${PREFIX}black --target-version=py37 $SOURCE_FILES
