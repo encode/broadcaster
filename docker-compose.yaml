@@ -39,6 +39,7 @@ services:
   mqtt:
     image: "eclipse-mosquitto"
     hostname: mqtt
+    command: mosquitto -c /mosquitto-no-auth.conf
     ports:
       - 1883:1883
-      - 8883:8883
+
