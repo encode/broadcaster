@@ -83,7 +83,7 @@ async def test_mqtt():
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
             assert event.channel == "chatroom"
-            assert event.message.decode("utf-8") == "hello"
+            assert event.message == b"hello"
 
 
 @pytest.mark.asyncio
