@@ -46,6 +46,11 @@ class Broadcast:
 
             self._backend = KafkaBackend(url)
 
+        if parsed_url.scheme == "nats":
+            from broadcaster._backends.nats import NATSBackend
+
+            self._backend = NATSBackend(url)
+
         elif parsed_url.scheme == "memory":
             from broadcaster._backends.memory import MemoryBackend
 

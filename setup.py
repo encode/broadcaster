@@ -49,6 +49,7 @@ setup(
         "redis": ["asyncio-redis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"],
+        "nats": ["asyncio-nats-client"],
         "test": ["pytest", "pytest-asyncio"],
     },
     classifiers=[
