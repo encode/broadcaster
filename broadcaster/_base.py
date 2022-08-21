@@ -51,6 +51,11 @@ class Broadcast:
 
             self._backend = MemoryBackend(url)
 
+        elif parsed_url.scheme in ("mqtt", "mqtts"):
+            from ._backends.mqtt import MqttBackend
+
+            self._backend = MqttBackend(url)
+
     async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self

@@ -36,3 +36,10 @@ services:
       - POSTGRES_USER=postgres
     ports:
       - 5432:5432
+  mqtt:
+    image: "eclipse-mosquitto"
+    hostname: mqtt
+    command: mosquitto -c /mosquitto-no-auth.conf
+    ports:
+      - 1883:1883
+

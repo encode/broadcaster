@@ -1,4 +1,4 @@
--e .[redis,postgres,kafka]
+-e .[redis,postgres,kafka,mqtt]
 
 # Documentation
 mkdocs==1.3.1
