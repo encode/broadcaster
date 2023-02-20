@@ -2,7 +2,7 @@
 
 This is a fork of [encode/broadcaster](https://github.com/encode/broadcaster).
 
-----
+---
 
 Broadcaster helps you develop realtime streaming functionality by providing
 a simple broadcast API onto a number of different backend services.
@@ -73,28 +73,41 @@ Python 3.7+
 
 ## Installation
 
-* `pip install permit-broadcaster`
-* `pip install permit-broadcaster[redis]`
-* `pip install permit-broadcaster[postgres]`
-* `pip install permit-broadcaster[kafka]`
+- `pip install permit-broadcaster`
+- `pip install permit-broadcaster[redis]`
+- `pip install permit-broadcaster[postgres]`
+- `pip install permit-broadcaster[kafka]`
 
 ## Available backends
 
-* `Broadcast('memory://')`
-* `Broadcast("redis://localhost:6379")`
-* `Broadcast("postgres://localhost:5432/broadcaster")`
-* `Broadcast("kafka://localhost:9092")`
+- `Broadcast('memory://')`
+- `Broadcast("redis://localhost:6379")`
+- `Broadcast("postgres://localhost:5432/broadcaster")`
+- `Broadcast("kafka://localhost:9092")`
+
+## Kafka environment variables
+
+The following environment variables are exposed to allow SASL authentication with Kafka (along with their default assignment):
+
+```
+KAFKA_SECURITY_PROTOCOL=PLAINTEXT   # PLAINTEXT, SASL_PLAINTEXT, SASL_SSL
+KAFKA_SASL_MECHANISM=PLAIN   # PLAIN, SCRAM-SHA-256, SCRAM-SHA-512
+KAFKA_PLAIN_USERNAME=None   # any str
+KAFKA_PLAIN_PASSWORD=None   # any str
+```
+
+For full details refer to the (AIOKafka options)[https://aiokafka.readthedocs.io/en/stable/api.html#producer-class] where the variable name matches the capitalised env var with an additional `KAFKA_` prefix.
 
 ## Where next?
 
 At the moment `broadcaster` is in Alpha, and should be considered a working design document.
 
-The API should be considered subject to change. If you *do* want to use Broadcaster in its current
+The API should be considered subject to change. If you _do_ want to use Broadcaster in its current
 state, make sure to strictly pin your requirements to `broadcaster==0.2.0`.
 
 To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
 
-* Serialization / deserialization to support broadcasting structured data.
-* Backends for Redis Streams, Apache Kafka, and RabbitMQ.
-* Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
-* Support for pattern subscribes in backends that support it.
+- Serialization / deserialization to support broadcasting structured data.
+- Backends for Redis Streams, Apache Kafka, and RabbitMQ.
+- Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We _might_ also want to support some basic paging operations, to allow applications to scan back in the event history.
+- Support for pattern subscribes in backends that support it.
