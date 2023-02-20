@@ -84,6 +84,7 @@ Python 3.7+
 - `Broadcast("redis://localhost:6379")`
 - `Broadcast("postgres://localhost:5432/broadcaster")`
 - `Broadcast("kafka://localhost:9092")`
+- `Broadcast("kafka://broker_1:9092,broker_2:9092")`
 
 ## Kafka environment variables
 

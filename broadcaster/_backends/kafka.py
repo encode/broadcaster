@@ -13,7 +13,8 @@ from .base import BroadcastBackend
 
 class KafkaBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self._servers = [urlparse(url).netloc]
+        parsed_url = urlparse(url).netloc
+        self._servers = parsed_url.split(',')
         self._consumer_channels: typing.Set = set()
         self._security_protocol = os.environ.get("KAFKA_SECURITY_PROTOCOL") or "PLAINTEXT"
         self._sasl_mechanism = os.environ.get("KAFKA_SASL_MECHANISM") or "PLAIN"
