@@ -84,6 +84,20 @@ Python 3.7+
 * `Broadcast("redis://localhost:6379")`
 * `Broadcast("postgres://localhost:5432/broadcaster")`
 * `Broadcast("kafka://localhost:9092")`
+* `Broadcast("kafka://broker_1:9092,broker_2:9092")`
+
+## Kafka environment variables
+
+The following environment variables are exposed to allow SASL authentication with Kafka (along with their default assignment):
+
+```
+KAFKA_SECURITY_PROTOCOL=PLAINTEXT   # PLAINTEXT, SASL_PLAINTEXT, SASL_SSL
+KAFKA_SASL_MECHANISM=PLAIN   # PLAIN, SCRAM-SHA-256, SCRAM-SHA-512
+KAFKA_PLAIN_USERNAME=None   # any str
+KAFKA_PLAIN_PASSWORD=None   # any str
+```
+
+For full details refer to the (AIOKafka options)[https://aiokafka.readthedocs.io/en/stable/api.html#producer-class] where the variable name matches the capitalised env var with an additional `KAFKA_` prefix.
 
 ## Where next?
 
