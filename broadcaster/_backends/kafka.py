@@ -1,6 +1,6 @@
+import logging
 import os
 import typing
-import logging
 from urllib.parse import urlparse
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -13,13 +13,19 @@ from .base import BroadcastBackend
 class KafkaBackend(BroadcastBackend):
     def __init__(self, url: str):
         parsed_url = urlparse(url).netloc
-        self._servers = parsed_url.split(',')
+        self._servers = parsed_url.split(",")
         self._consumer_channels: typing.Set = set()
-        self._security_protocol = os.environ.get("KAFKA_SECURITY_PROTOCOL") or "PLAINTEXT"
+        self._security_protocol = (
+            os.environ.get("KAFKA_SECURITY_PROTOCOL") or "PLAINTEXT"
+        )
         self._sasl_mechanism = os.environ.get("KAFKA_SASL_MECHANISM") or "PLAIN"
         self._sasl_plain_username = os.environ.get("KAFKA_PLAIN_USERNAME")
         self._sasl_plain_password = os.environ.get("KAFKA_PLAIN_PASSWORD")
-        self._ssl_context = create_ssl_context() if self._security_protocol in ["SSL", "SASL_SSL"] else None
+        self._ssl_context = (
+            create_ssl_context()
+            if self._security_protocol in ["SSL", "SASL_SSL"]
+            else None
+        )
 
     async def connect(self) -> None:
         logging.info(f"connecting to brokers: {self._servers}")
@@ -45,7 +51,6 @@ class KafkaBackend(BroadcastBackend):
         except Exception as e:
             logging.error(e)
             raise e
-
 
     async def disconnect(self) -> None:
         await self._producer.stop()
