@@ -1,5 +1,4 @@
 import os
-import asyncio
 import typing
 import logging
 from urllib.parse import urlparse
@@ -25,9 +24,7 @@ class KafkaBackend(BroadcastBackend):
     async def connect(self) -> None:
         logging.info(f"connecting to brokers: {self._servers}")
         try:
-            loop = asyncio.get_event_loop()
             self._producer = AIOKafkaProducer(
-                loop=loop,
                 bootstrap_servers=self._servers,
                 security_protocol=self._security_protocol,
                 ssl_context=self._ssl_context,
@@ -36,7 +33,6 @@ class KafkaBackend(BroadcastBackend):
                 sasl_plain_password=self._sasl_plain_password,
             )
             self._consumer = AIOKafkaConsumer(
-                loop=loop,
                 bootstrap_servers=self._servers,
                 security_protocol=self._security_protocol,
                 ssl_context=self._ssl_context,
@@ -60,7 +56,7 @@ class KafkaBackend(BroadcastBackend):
         self._consumer.subscribe(topics=self._consumer_channels)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._consumer.unsubscribe()
+        self._consumer.unsubscribe()
 
     async def publish(self, channel: str, message: typing.Any) -> None:
         await self._producer.send_and_wait(channel, message.encode("utf8"))
