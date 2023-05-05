@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, AsyncIterator, Dict, Optional
+from typing import Any, AsyncGenerator, Dict, Optional, AsyncIterator
 from urllib.parse import urlparse
 
 
@@ -51,6 +51,8 @@ class Broadcast:
 
             self._backend = MemoryBackend(url)
 
+        self._listener_task: asyncio.Task | None = None
+
     async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self
@@ -60,13 +62,13 @@ class Broadcast:
 
     async def connect(self) -> None:
         await self._backend.connect()
-        self._listener_task = asyncio.create_task(self._listener())
 
     async def disconnect(self) -> None:
-        if self._listener_task.done():
-            self._listener_task.result()
-        else:
-            self._listener_task.cancel()
+        if self._listener_task:
+            if self._listener_task.done():
+                self._listener_task.result()
+            else:
+                self._listener_task.cancel()
         await self._backend.disconnect()
 
     async def _listener(self) -> None:
@@ -85,6 +87,8 @@ class Broadcast:
         try:
             if not self._subscribers.get(channel):
                 await self._backend.subscribe(channel)
+                if not self._listener_task:
+                    self._listener_task = asyncio.create_task(self._listener())
                 self._subscribers[channel] = set([queue])
             else:
                 self._subscribers[channel].add(queue)

@@ -46,7 +46,7 @@ setup(
     package_data={"broadcaster": ["py.typed"]},
     include_package_data=True,
     extras_require={
-        "redis": ["asyncio-redis"],
+        "redis": ["redis"],
         "postgres": ["asyncpg"],
         "kafka": ["aiokafka"],
         "test": ["pytest", "pytest-asyncio"],
