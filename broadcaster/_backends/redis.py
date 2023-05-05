@@ -42,8 +42,7 @@ class RedisBackend(BroadcastBackend):
         while not message:
             #
             message = await self._sub_conn.get_message(timeout=None)
-        event = Event(
+        return Event(
             channel=message["channel"].decode(),
             message=message["data"].decode(),
         )
-        return event
