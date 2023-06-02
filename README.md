@@ -99,7 +99,7 @@ KAFKA_SSL_CAFILE=None   # CA Certificate file path for kafka connection
 KAFKA_SSL_CAPATH=None   # Path to directory of trusted PEM certificates for kafka connection
 KAFKA_SSL_CERTFILE=None   # Public Certificate path matching key to use for Kafka connection in PEM format
 KAFKA_SSL_KEYFILE=None   # Private key path to use for Kafka connection in PEM format
-KAFKA_SSL_KEYPASSWORD=None   # Private key password
+KAFKA_SSL_KEY_PASSWORD=None   # Private key password
 ```
 
 For full details refer to the (AIOKafka options)[https://aiokafka.readthedocs.io/en/stable/api.html#producer-class] where the variable name matches the capitalised env var with an additional `KAFKA_` prefix.
