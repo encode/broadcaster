@@ -95,9 +95,15 @@ KAFKA_SECURITY_PROTOCOL=PLAINTEXT   # PLAINTEXT, SASL_PLAINTEXT, SASL_SSL
 KAFKA_SASL_MECHANISM=PLAIN   # PLAIN, SCRAM-SHA-256, SCRAM-SHA-512
 KAFKA_PLAIN_USERNAME=None   # any str
 KAFKA_PLAIN_PASSWORD=None   # any str
+KAFKA_SSL_CAFILE=None   # CA Certificate file path for kafka connection
+KAFKA_SSL_CAPATH=None   # Path to directory of trusted PEM certificates for kafka connection
+KAFKA_SSL_CERTFILE=None   # Public Certificate path matching key to use for Kafka connection in PEM format
+KAFKA_SSL_KEYFILE=None   # Private key path to use for Kafka connection in PEM format
+KAFKA_SSL_KEY_PASSWORD=None   # Private key password
 ```
 
 For full details refer to the (AIOKafka options)[https://aiokafka.readthedocs.io/en/stable/api.html#producer-class] where the variable name matches the capitalised env var with an additional `KAFKA_` prefix.
+For SSL properties see (AIOKafka SSL Context)[https://aiokafka.readthedocs.io/en/stable/api.html#aiokafka.helpers.create_ssl_context].
 
 ## Where next?
 

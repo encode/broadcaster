@@ -21,8 +21,19 @@ class KafkaBackend(BroadcastBackend):
         self._sasl_mechanism = os.environ.get("KAFKA_SASL_MECHANISM") or "PLAIN"
         self._sasl_plain_username = os.environ.get("KAFKA_PLAIN_USERNAME")
         self._sasl_plain_password = os.environ.get("KAFKA_PLAIN_PASSWORD")
+        self._ssl_keyfile = os.environ.get("KAFKA_SSL_KEYFILE")
+        self._ssl_keypassword = os.environ.get("KAFKA_SSL_KEY_PASSWORD")
+        self._ssl_cafile = os.environ.get("KAFKA_SSL_CAFILE")
+        self._ssl_capath = os.environ.get("KAFKA_SSL_CAPATH")
+        self._ssl_certfile = os.environ.get("KAFKA_SSL_CERTFILE")
         self._ssl_context = (
-            create_ssl_context()
+            create_ssl_context(
+                cafile=self._ssl_cafile,
+                capath=self._ssl_capath,
+                certfile=self._ssl_certfile,
+                keyfile=self._ssl_keyfile,
+                password=self._ssl_keypassword,
+            )
             if self._security_protocol in ["SSL", "SASL_SSL"]
             else None
         )
