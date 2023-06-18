@@ -65,7 +65,7 @@ The HTML template for the front end [is available here](https://github.com/encod
 
 ## Requirements
 
-Python 3.7+
+Python 3.8+
 
 ## Installation
 
