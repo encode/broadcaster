@@ -6,8 +6,8 @@ mkautodoc==0.2.0
 mkdocs-material==8.4.0
 
 # Packaging
+build==0.10.0
 twine==4.0.1
-wheel==0.37.1
 
 # Tests & Linting
 autoflake==1.4
