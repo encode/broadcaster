@@ -1,6 +1,5 @@
 import os
 
-import uvicorn
 from starlette.applications import Starlette
 from starlette.concurrency import run_until_first_complete
 from starlette.routing import Route, WebSocketRoute

@@ -46,3 +46,26 @@ path = "broadcaster/__init__.py"
 include = [
     "/broadcaster",
 ]
+
+[tool.ruff]
+ignore = ["W293", "W291"]
+line-length = 120
+
+[tool.ruff.isort]
+combine-as-imports = true
+
+[tool.mypy]
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+addopts = "-rxXs"
+markers = "copied_from(source, changes=None): mark test as copied from somewhere else, along with a description of changes made to accodomate e.g. our test setup"
+
+[tool.coverage.run]
+source_pkgs = ["broadcaster", "tests"]
