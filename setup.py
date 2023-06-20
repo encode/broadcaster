@@ -33,7 +33,7 @@ def get_packages(package):
 
 setup(
     name="permit-broadcaster",
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     version=get_version("broadcaster"),
     url="https://github.com/permitio/broadcaster",
     license="BSD",
@@ -59,7 +59,6 @@ setup(
         "Operating System :: OS Independent",
         "Topic :: Internet :: WWW/HTTP",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
