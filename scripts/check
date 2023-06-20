@@ -9,6 +9,5 @@ export SOURCE_FILES="broadcaster tests"
 set -x
 
 ${PREFIX}black --check --diff --target-version=py37 $SOURCE_FILES
-${PREFIX}flake8 $SOURCE_FILES
+${PREFIX}ruff check $SOURCE_FILES
 ${PREFIX}mypy $SOURCE_FILES
-${PREFIX}isort --check --diff --project=broadcaster $SOURCE_FILES
