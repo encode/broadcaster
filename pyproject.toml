@@ -48,8 +48,9 @@ include = [
 ]
 
 [tool.ruff]
-ignore = ["W293", "W291"]
+ignore = []
 line-length = 120
+select = ["E","F","W"]
 
 [tool.ruff.isort]
 combine-as-imports = true
