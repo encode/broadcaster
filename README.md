@@ -12,7 +12,7 @@ Here's a complete example of the backend code for a simple websocket chat app:
 **app.py**
 
 ```python
-# Requires: `starlette`, `uvicorn`, `jinja2`, `anyio`
+# Requires: `starlette`, `uvicorn`, `jinja2`
 # Run with `uvicorn example:app`
 import anyio
 from broadcaster import Broadcast
