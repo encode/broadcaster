@@ -36,11 +36,11 @@ async def chatroom_ws(websocket):
 
     async with anyio.create_task_group() as task_group:
         # run until first is complete
-        async def run(func) -> None:
-            await func()
+        async def run_chatroom_ws_receiver() -> None:
+            await chatroom_ws_receiver(websocket=websocket)
             task_group.cancel_scope.cancel()
 
-        task_group.start_soon(run, lambda: chatroom_ws_receiver(websocket))
+        task_group.start_soon(run_chatroom_ws_receiver)
         await chatroom_ws_sender(websocket)
 
 
