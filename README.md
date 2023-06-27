@@ -41,7 +41,7 @@ async def chatroom_ws(websocket):
             task_group.cancel_scope.cancel()
 
         task_group.start_soon(run, lambda: chatroom_ws_receiver(websocket))
-        task_group.start_soon(run, lambda: chatroom_ws_sender(websocket))
+        await chatroom_ws_sender(websocket)
 
 
 async def chatroom_ws_receiver(websocket):
