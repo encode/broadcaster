@@ -3,3 +3,4 @@ websockets
 starlette
 jinja2
 broadcaster[redis,postgres,kafka]
+anyio
