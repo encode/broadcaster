@@ -21,7 +21,7 @@ from starlette.routing import Route, WebSocketRoute
 from starlette.templating import Jinja2Templates
 
 
-broadcast = Broadcast("redis://localhost:6379")
+broadcast = Broadcast("memory://")
 templates = Jinja2Templates("templates")
 
 
