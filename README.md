@@ -14,9 +14,9 @@ Here's a complete example of the backend code for a simple websocket chat app:
 ```python
 # Requires: `starlette`, `uvicorn`, `jinja2`
 # Run with `uvicorn example:app`
+import anyio
 from broadcaster import Broadcast
 from starlette.applications import Starlette
-from starlette.concurrency import run_until_first_complete
 from starlette.routing import Route, WebSocketRoute
 from starlette.templating import Jinja2Templates
 
@@ -33,10 +33,15 @@ async def homepage(request):
 
 async def chatroom_ws(websocket):
     await websocket.accept()
-    await run_until_first_complete(
-        (chatroom_ws_receiver, {"websocket": websocket}),
-        (chatroom_ws_sender, {"websocket": websocket}),
-    )
+
+    async with anyio.create_task_group() as task_group:
+        # run until first is complete
+        async def run_chatroom_ws_receiver() -> None:
+            await chatroom_ws_receiver(websocket=websocket)
+            task_group.cancel_scope.cancel()
+
+        task_group.start_soon(run_chatroom_ws_receiver)
+        await chatroom_ws_sender(websocket)
 
 
 async def chatroom_ws_receiver(websocket):
