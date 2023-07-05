@@ -10,7 +10,7 @@ build==0.10.0
 twine==4.0.1
 
 # Tests & Linting
-ruff==0.0.272
+ruff==0.0.277
 black==22.6.0
 coverage==6.4.4
 mypy==0.971
