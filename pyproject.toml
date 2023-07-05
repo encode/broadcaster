@@ -70,3 +70,8 @@ markers = "copied_from(source, changes=None): mark test as copied from somewhere
 
 [tool.coverage.run]
 source_pkgs = ["broadcaster", "tests"]
+
+[tool.coverage.report]
+fail_under = 78
+show_missing = true
+skip_covered = true
