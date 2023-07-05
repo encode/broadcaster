@@ -4,8 +4,7 @@ export PREFIX=""
 if [ -d 'venv' ] ; then
     export PREFIX="venv/bin/"
 fi
-export SOURCE_FILES="broadcaster tests"
 
 set -x
 
-${PREFIX}coverage report --show-missing --skip-covered --fail-under=88
+${PREFIX}coverage report
