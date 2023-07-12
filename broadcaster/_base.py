@@ -72,8 +72,16 @@ class Broadcast:
     async def _listener(self) -> None:
         while True:
             event = await self._backend.next_published()
+            if event is None:
+                # Backend is disconnected
+                break
+
             for queue in list(self._subscribers.get(event.channel, [])):
                 await queue.put(event)
+
+        # Ubsubscribe all
+        for queue in sum([list(qs) for qs in self._subscribers.values()], []):
+            await queue.put(None)
 
     async def publish(self, channel: str, message: Any) -> None:
         await self._backend.publish(channel, message)
