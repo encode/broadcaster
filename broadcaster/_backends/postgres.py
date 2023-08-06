@@ -8,16 +8,27 @@ from .base import BroadcastBackend
 
 
 class PostgresBackend(BroadcastBackend):
+    _pools = {}
+    _pools_lock = asyncio.Lock()
+
     def __init__(self, url: str):
         self._url = url
 
+    async def _get_pool(self):
+        async with self.__class__._pools_lock:
+            if self._url not in self.__class__._pools:
+                self.__class__._pools[self._url] = await asyncpg.create_pool(self._url)
+            return self.__class__._pools[self._url]
+
     async def connect(self) -> None:
-        self._conn = await asyncpg.connect(self._url)
+        self._conn = await (await self._get_pool()).acquire()
         self._listen_queue: asyncio.Queue = asyncio.Queue()
         self._conn.add_termination_listener(self._termination_listener)
 
     async def disconnect(self) -> None:
-        await self._conn.close()
+        self._conn.remove_termination_listener(self._termination_listener)
+        await (await self._get_pool()).release(self._conn)
+        self._conn = None
 
     async def subscribe(self, channel: str) -> None:
         await self._conn.add_listener(channel, self._listener)
