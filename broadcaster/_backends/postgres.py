@@ -2,10 +2,15 @@ import asyncio
 from typing import Any
 
 import asyncpg
+import os
 
 from .._base import Event
 from .base import BroadcastBackend
 
+try:
+    POOL_MAX_SIZE = int(os.getenv("BROADCASTER_PG_MAX_POOL_SIZE"))
+except TypeError:
+    POOL_MAX_SIZE = 10
 
 class PostgresBackend(BroadcastBackend):
     _pools = {}
@@ -17,7 +22,7 @@ class PostgresBackend(BroadcastBackend):
     async def _get_pool(self):
         async with self.__class__._pools_lock:
             if self._url not in self.__class__._pools:
-                self.__class__._pools[self._url] = await asyncpg.create_pool(self._url)
+                self.__class__._pools[self._url] = await asyncpg.create_pool(self._url, max_size=POOL_MAX_SIZE)
             return self.__class__._pools[self._url]
 
     async def connect(self) -> None:
