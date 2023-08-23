@@ -31,7 +31,12 @@ class PostgresBackend(BroadcastBackend):
         self._conn.add_termination_listener(self._termination_listener)
 
     async def disconnect(self) -> None:
-        self._conn.remove_termination_listener(self._termination_listener)
+        try:
+            self._conn.remove_termination_listener(self._termination_listener)
+        except Exception:
+            # Best effort, would fail if conn already closed (thus released)
+            pass
+
         await (await self._get_pool()).release(self._conn)
         self._conn = None
 
@@ -39,7 +44,11 @@ class PostgresBackend(BroadcastBackend):
         await self._conn.add_listener(channel, self._listener)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._conn.remove_listener(channel, self._listener)
+        try:
+            await self._conn.remove_listener(channel, self._listener)
+        except Exception:
+            # Best effort, would fail if conn already closed (thus released)
+            pass
 
     async def publish(self, channel: str, message: str) -> None:
         await self._conn.execute("SELECT pg_notify($1, $2);", channel, message)
