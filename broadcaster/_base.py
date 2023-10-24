@@ -88,7 +88,7 @@ class Broadcast:
         try:
             if not self._subscribers.get(channel):
                 await self._backend.subscribe(channel)
-                self._subscribers[channel] = set([queue])
+                self._subscribers[channel] = {queue}
             else:
                 self._subscribers[channel].add(queue)
 
