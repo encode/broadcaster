@@ -51,7 +51,7 @@ class RedisBackend(BroadcastBackend):
 
 class RedisStreamBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self.conn_url = url.replace('redis-stream', 'redis', 1)
+        self.conn_url = url.replace("redis-stream", "redis", 1)
         self.streams: typing.Dict = dict()
         self._ready = asyncio.Event()
         self._producer = redis.Redis.from_url(self.conn_url)
@@ -65,8 +65,11 @@ class RedisStreamBackend(BroadcastBackend):
         await self._consumer.close()
 
     async def subscribe(self, channel: str) -> None:
-        info = await self._consumer.xinfo_stream(channel)
-        last_id = info['last-generated-id']
+        try:
+            info = await self._consumer.xinfo_stream(channel)
+            last_id = info["last-generated-id"]
+        except aioredis.exceptions.ResponseError:
+            last_id = "0"
         self.streams[channel] = last_id
         self._ready.set()
 
@@ -74,7 +77,7 @@ class RedisStreamBackend(BroadcastBackend):
         self.streams.pop(channel, None)
 
     async def publish(self, channel: str, message: typing.Any) -> None:
-        await self._producer.xadd(channel, {'message': message})
+        await self._producer.xadd(channel, {"message": message})
 
     async def wait_for_messages(self) -> typing.List:
         await self._ready.wait()
@@ -87,8 +90,8 @@ class RedisStreamBackend(BroadcastBackend):
         messages = await self.wait_for_messages()
         stream, events = messages[0]
         _msg_id, message = events[0]
-        self.streams[stream.decode('utf-8')] = _msg_id.decode('utf-8')
+        self.streams[stream.decode("utf-8")] = _msg_id.decode("utf-8")
         return Event(
-            channel=stream.decode('utf-8'),
-            message=message.get(b'message').decode('utf-8'),
+            channel=stream.decode("utf-8"),
+            message=message.get(b"message").decode("utf-8"),
         )
