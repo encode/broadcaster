@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-redis = ["asyncio-redis"]
+redis = ["asyncio-redis", "aioredis>=2.0.1"]
 postgres = ["asyncpg"]
 kafka = ["aiokafka"]
 test =  ["pytest", "pytest-asyncio"]
