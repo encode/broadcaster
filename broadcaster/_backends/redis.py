@@ -14,15 +14,15 @@ class RedisBackend(BroadcastBackend):
         self._host = parsed_url.hostname or "localhost"
         self._port = parsed_url.port or 6379
         self._password = parsed_url.password or None
-
+        self._ssl = parsed_url.scheme == "rediss"
+        self.kwargs = {"host": self._host, "port": self._port, "password": self._password, "ssl": self._ssl}
+        
         self._sub_conn: PubSub | None = None
         self._pub_conn: PubSub | None = None
 
     async def connect(self) -> None:
-        kwargs = {"host": self._host, "port": self._port, "password": self._password}
-        print(kwargs)
-        self._pub_conn = redis.Redis(**kwargs).pubsub()
-        self._sub_conn = redis.Redis(**kwargs).pubsub()
+        self._pub_conn = redis.Redis(**self.kwargs).pubsub()
+        self._sub_conn = redis.Redis(**self.kwargs).pubsub()
 
     async def disconnect(self) -> None:
         await self._pub_conn.close()
