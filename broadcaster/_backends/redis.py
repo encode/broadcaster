@@ -1,7 +1,8 @@
-import typing
+from typing import Any
 from urllib.parse import urlparse
 
-import asyncio_redis
+import redis.asyncio as redis
+from redis.asyncio.client import PubSub
 
 from .._base import Event
 from .base import BroadcastBackend
@@ -14,25 +15,34 @@ class RedisBackend(BroadcastBackend):
         self._port = parsed_url.port or 6379
         self._password = parsed_url.password or None
 
+        self._sub_conn: PubSub | None = None
+        self._pub_conn: PubSub | None = None
+
     async def connect(self) -> None:
         kwargs = {"host": self._host, "port": self._port, "password": self._password}
-        self._pub_conn = await asyncio_redis.Connection.create(**kwargs)
-        self._sub_conn = await asyncio_redis.Connection.create(**kwargs)
-        self._subscriber = await self._sub_conn.start_subscribe()
+        print(kwargs)
+        self._pub_conn = redis.Redis(**kwargs).pubsub()
+        self._sub_conn = redis.Redis(**kwargs).pubsub()
 
     async def disconnect(self) -> None:
-        self._pub_conn.close()
-        self._sub_conn.close()
+        await self._pub_conn.close()
+        await self._sub_conn.close()
 
     async def subscribe(self, channel: str) -> None:
-        await self._subscriber.subscribe([channel])
+        await self._sub_conn.subscribe(channel)
 
     async def unsubscribe(self, channel: str) -> None:
-        await self._subscriber.unsubscribe([channel])
+        await self._sub_conn.unsubscribe(channel)
 
-    async def publish(self, channel: str, message: typing.Any) -> None:
-        await self._pub_conn.publish(channel, message)
+    async def publish(self, channel: str, message: Any) -> None:
+        await self._pub_conn.execute_command("PUBLISH", channel, message)
 
     async def next_published(self) -> Event:
-        message = await self._subscriber.next_published()
-        return Event(channel=message.channel, message=message.value)
+        message = None
+        while not message:
+            message = await self._sub_conn.get_message(ignore_subscribe_messages=True, timeout=None)
+        event = Event(
+            channel=message["channel"].decode(),
+            message=message["data"].decode(),
+        )
+        return event

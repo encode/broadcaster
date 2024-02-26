@@ -1,6 +1,6 @@
 import asyncio
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, AsyncIterator, Dict, Optional
+from typing import Any, AsyncGenerator, Optional, AsyncIterator
 from urllib.parse import urlparse
 
 
@@ -26,13 +26,13 @@ class Unsubscribed(Exception):
 
 class Broadcast:
     def __init__(self, url: str):
-        from broadcaster._backends.base import BroadcastBackend
+        from ._backends.base import BroadcastBackend
 
         parsed_url = urlparse(url)
         self._backend: BroadcastBackend
-        self._subscribers: Dict[str, Any] = {}
+        self._subscribers: dict[str, set[asyncio.Queue]] = {}
         if parsed_url.scheme in ("redis", "rediss"):
-            from broadcaster._backends.redis import RedisBackend
+            from ._backends.redis import RedisBackend
 
             self._backend = RedisBackend(url)
 
@@ -51,6 +51,8 @@ class Broadcast:
 
             self._backend = MemoryBackend(url)
 
+        self._listener_task: asyncio.Task | None = None
+
     async def __aenter__(self) -> "Broadcast":
         await self.connect()
         return self
@@ -60,13 +62,13 @@ class Broadcast:
 
     async def connect(self) -> None:
         await self._backend.connect()
-        self._listener_task = asyncio.create_task(self._listener())
 
     async def disconnect(self) -> None:
-        if self._listener_task.done():
-            self._listener_task.result()
-        else:
-            self._listener_task.cancel()
+        if self._listener_task:
+            if self._listener_task.done():
+                self._listener_task.result()
+            else:
+                self._listener_task.cancel()
         await self._backend.disconnect()
 
     async def _listener(self) -> None:
@@ -81,10 +83,11 @@ class Broadcast:
     @asynccontextmanager
     async def subscribe(self, channel: str) -> AsyncIterator["Subscriber"]:
         queue: asyncio.Queue = asyncio.Queue()
-
         try:
             if not self._subscribers.get(channel):
                 await self._backend.subscribe(channel)
+                if not self._listener_task:
+                    self._listener_task = asyncio.create_task(self._listener())
                 self._subscribers[channel] = set([queue])
             else:
                 self._subscribers[channel].add(queue)
