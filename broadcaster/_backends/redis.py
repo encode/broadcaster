@@ -15,8 +15,13 @@ class RedisBackend(BroadcastBackend):
         self._port = parsed_url.port or 6379
         self._password = parsed_url.password or None
         self._ssl = parsed_url.scheme == "rediss"
-        self.kwargs = {"host": self._host, "port": self._port, "password": self._password, "ssl": self._ssl}
-        
+        self.kwargs = {
+            "host": self._host,
+            "port": self._port,
+            "password": self._password,
+            "ssl": self._ssl,
+        }
+
         self._sub_conn: PubSub | None = None
         self._pub_conn: PubSub | None = None
 
@@ -40,7 +45,9 @@ class RedisBackend(BroadcastBackend):
     async def next_published(self) -> Event:
         message = None
         while not message:
-            message = await self._sub_conn.get_message(ignore_subscribe_messages=True, timeout=None)
+            message = await self._sub_conn.get_message(
+                ignore_subscribe_messages=True, timeout=None
+            )
         event = Event(
             channel=message["channel"].decode(),
             message=message["data"].decode(),
