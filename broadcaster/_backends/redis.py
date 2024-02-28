@@ -6,6 +6,7 @@ from redis.asyncio.client import PubSub
 
 from .._base import Event
 from .base import BroadcastBackend
+import asyncio
 
 
 class RedisBackend(BroadcastBackend):
@@ -40,7 +41,12 @@ class RedisBackend(BroadcastBackend):
         await self._sub_conn.unsubscribe(channel)
 
     async def publish(self, channel: str, message: Any) -> None:
-        await self._pub_conn.execute_command("PUBLISH", channel, message)
+        try:
+            await self._pub_conn.execute_command("PUBLISH", channel, message)
+        except redis.ConnectionError:
+            await asyncio.sleep(1)
+            self._pub_conn = redis.Redis(**self.kwargs).pubsub()
+            await self.publish(channel, message)
 
     async def next_published(self) -> Event:
         message = None
