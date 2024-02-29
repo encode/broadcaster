@@ -43,7 +43,7 @@ class RedisBackend(BroadcastBackend):
     async def publish(self, channel: str, message: Any) -> None:
         try:
             await self._pub_conn.execute_command("PUBLISH", channel, message)
-        except redis.ConnectionError:
+        except (redis.ConnectionError, redis.TimeoutError):
             await asyncio.sleep(1)
             self._pub_conn = redis.Redis(**self.kwargs).pubsub()
             await self.publish(channel, message)
