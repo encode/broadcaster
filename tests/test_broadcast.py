@@ -63,8 +63,11 @@ async def test_unknown_backend():
     with pytest.raises(ValueError, match="Unsupported backend"):
         async with Broadcast(url="unknown://"):
             pass
-        
+
+
 @pytest.mark.asyncio
 async def test_needs_url_or_backend():
-    with pytest.raises(AssertionError, match="Either `url` or `backend` must be provided."):
+    with pytest.raises(
+        AssertionError, match="Either `url` or `backend` must be provided."
+    ):
         Broadcast()
