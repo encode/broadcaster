@@ -1,7 +1,18 @@
 import asyncio
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, AsyncIterator, Dict, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncGenerator,
+    AsyncIterator,
+    Dict,
+    Optional,
+    cast,
+)
 from urllib.parse import urlparse
+
+if TYPE_CHECKING:  # pragma: no cover
+    from broadcaster._backends.base import BroadcastBackend
 
 
 class Event:
@@ -25,31 +36,35 @@ class Unsubscribed(Exception):
 
 
 class Broadcast:
-    def __init__(self, url: str):
-        from broadcaster._backends.base import BroadcastBackend
-
-        parsed_url = urlparse(url)
-        self._backend: BroadcastBackend
+    def __init__(
+        self, url: Optional[str] = None, *, backend: Optional["BroadcastBackend"] = None
+    ) -> None:
+        assert url or backend, "Either `url` or `backend` must be provided."
+        self._backend = backend or self._create_backend(cast(str, url))
         self._subscribers: Dict[str, Any] = {}
+
+    def _create_backend(self, url: str) -> "BroadcastBackend":
+        parsed_url = urlparse(url)
         if parsed_url.scheme in ("redis", "rediss"):
             from broadcaster._backends.redis import RedisBackend
 
-            self._backend = RedisBackend(url)
+            return RedisBackend(url)
 
         elif parsed_url.scheme in ("postgres", "postgresql"):
             from broadcaster._backends.postgres import PostgresBackend
 
-            self._backend = PostgresBackend(url)
+            return PostgresBackend(url)
 
         if parsed_url.scheme == "kafka":
             from broadcaster._backends.kafka import KafkaBackend
 
-            self._backend = KafkaBackend(url)
+            return KafkaBackend(url)
 
         elif parsed_url.scheme == "memory":
             from broadcaster._backends.memory import MemoryBackend
 
-            self._backend = MemoryBackend(url)
+            return MemoryBackend(url)
+        raise ValueError(f"Unsupported backend: {parsed_url.scheme}")
 
     async def __aenter__(self) -> "Broadcast":
         await self.connect()
