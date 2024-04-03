@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 from urllib.parse import urlparse
 
@@ -10,7 +12,7 @@ from .base import BroadcastBackend
 class KafkaBackend(BroadcastBackend):
     def __init__(self, url: str):
         self._servers = [urlparse(url).netloc]
-        self._consumer_channels: typing.Set = set()
+        self._consumer_channels: set[str] = set()
 
     async def connect(self) -> None:
         self._producer = AIOKafkaProducer(bootstrap_servers=self._servers)

@@ -24,6 +24,8 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
     "anyio>=3.4.0,<5",
@@ -48,14 +50,17 @@ include = [
 ]
 
 [tool.ruff]
-ignore = []
 line-length = 120
-select = ["E","F","W"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "FA", "UP"]
 
 [tool.ruff.isort]
 combine-as-imports = true
 
 [tool.mypy]
+strict = true
+python_version = "3.8"
 disallow_untyped_defs = true
 ignore_missing_imports = true
 

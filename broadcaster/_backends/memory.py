@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import typing
 
@@ -7,10 +9,10 @@ from .base import BroadcastBackend
 
 class MemoryBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self._subscribed: typing.Set = set()
+        self._subscribed: set[str] = set()
 
     async def connect(self) -> None:
-        self._published: asyncio.Queue = asyncio.Queue()
+        self._published: asyncio.Queue[Event] = asyncio.Queue()
 
     async def disconnect(self) -> None:
         pass

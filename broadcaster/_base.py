@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import asyncio
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, AsyncIterator, Dict, Optional
+from typing import Any, AsyncGenerator, AsyncIterator
 from urllib.parse import urlparse
 
 
@@ -10,11 +12,7 @@ class Event:
         self.message = message
 
     def __eq__(self, other: object) -> bool:
-        return (
-            isinstance(other, Event)
-            and self.channel == other.channel
-            and self.message == other.message
-        )
+        return isinstance(other, Event) and self.channel == other.channel and self.message == other.message
 
     def __repr__(self) -> str:
         return f"Event(channel={self.channel!r}, message={self.message!r})"
@@ -30,7 +28,7 @@ class Broadcast:
 
         parsed_url = urlparse(url)
         self._backend: BroadcastBackend
-        self._subscribers: Dict[str, Any] = {}
+        self._subscribers: dict[str, set[asyncio.Queue[Event | None]]] = {}
         if parsed_url.scheme in ("redis", "rediss"):
             from broadcaster._backends.redis import RedisBackend
 
@@ -51,7 +49,7 @@ class Broadcast:
 
             self._backend = MemoryBackend(url)
 
-    async def __aenter__(self) -> "Broadcast":
+    async def __aenter__(self) -> Broadcast:
         await self.connect()
         return self
 
@@ -79,8 +77,8 @@ class Broadcast:
         await self._backend.publish(channel, message)
 
     @asynccontextmanager
-    async def subscribe(self, channel: str) -> AsyncIterator["Subscriber"]:
-        queue: asyncio.Queue = asyncio.Queue()
+    async def subscribe(self, channel: str) -> AsyncIterator[Subscriber]:
+        queue: asyncio.Queue[Event | None] = asyncio.Queue()
 
         try:
             if not self._subscribers.get(channel):
@@ -99,10 +97,10 @@ class Broadcast:
 
 
 class Subscriber:
-    def __init__(self, queue: asyncio.Queue) -> None:
+    def __init__(self, queue: asyncio.Queue[Event | None]) -> None:
         self._queue = queue
 
-    async def __aiter__(self) -> Optional[AsyncGenerator]:
+    async def __aiter__(self) -> AsyncGenerator[Event | None, None] | None:
         try:
             while True:
                 yield await self.get()

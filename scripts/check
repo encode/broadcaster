@@ -8,6 +8,6 @@ export SOURCE_FILES="broadcaster tests"
 
 set -x
 
-${PREFIX}black --check --diff --target-version=py37 $SOURCE_FILES
-${PREFIX}ruff check $SOURCE_FILES
+${PREFIX}ruff format --check --diff $SOURCE_FILES
 ${PREFIX}mypy $SOURCE_FILES
+${PREFIX}ruff check $SOURCE_FILES

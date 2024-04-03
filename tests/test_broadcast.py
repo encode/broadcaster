@@ -9,6 +9,7 @@ async def test_memory():
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
+            assert event
             assert event.channel == "chatroom"
             assert event.message == "hello"
 
@@ -25,9 +26,7 @@ async def test_redis():
 
 @pytest.mark.asyncio
 async def test_postgres():
-    async with Broadcast(
-        "postgres://postgres:postgres@localhost:5432/broadcaster"
-    ) as broadcast:
+    async with Broadcast("postgres://postgres:postgres@localhost:5432/broadcaster") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
