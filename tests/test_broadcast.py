@@ -9,7 +9,6 @@ async def test_memory():
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
-            assert event
             assert event.channel == "chatroom"
             assert event.message == "hello"
 
