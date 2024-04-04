@@ -95,11 +95,11 @@ and pass it to the `broadcaster` via `backend` argument.
 
 ```python
 from broadcaster import Broadcaster, BroadcastBackend
-class MyBackend(BroadcastBackend): ...
+
+class MyBackend(BroadcastBackend):
+    ...
 
 broadcaster = Broadcaster(backend=MyBackend())
-
-```
 
 ## Where next?
 
