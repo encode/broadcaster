@@ -86,6 +86,21 @@ Python 3.8+
 * `Broadcast("postgres://localhost:5432/broadcaster")`
 * `Broadcast("kafka://localhost:9092")`
 
+
+### Using custom backends
+
+You can create your own backend and use it with `broadcaster`.
+To do that you need to create a class which extends from `BroadcastBackend` 
+and pass it to the `broadcaster` via `backend` argument.
+
+```python
+from broadcaster import Broadcaster, BroadcastBackend
+
+class MyBackend(BroadcastBackend):
+    ...
+
+broadcaster = Broadcaster(backend=MyBackend())
+
 ## Where next?
 
 At the moment `broadcaster` is in Alpha, and should be considered a working design document.
