@@ -10,7 +10,7 @@ build==1.1.1
 twine==5.0.0
 
 # Tests & Linting
-ruff==0.1.15
+ruff==0.3.5
 coverage==7.4.3
 mypy==1.8.0
 pytest==8.0.2

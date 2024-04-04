@@ -54,7 +54,7 @@ line-length = 120
 [tool.ruff.lint]
 select = ["E", "F", "I", "FA", "UP"]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 combine-as-imports = true
 
 [tool.mypy]
