@@ -1,16 +1,19 @@
-import pytest
-import typing
+from __future__ import annotations
+
 import asyncio
+import typing
+
+import pytest
 
 from broadcaster import Broadcast, BroadcastBackend, Event
 
 
 class CustomBackend(BroadcastBackend):
     def __init__(self, url: str):
-        self._subscribed: typing.Set = set()
+        self._subscribed: set[str] = set()
 
     async def connect(self) -> None:
-        self._published: asyncio.Queue = asyncio.Queue()
+        self._published: asyncio.Queue[Event] = asyncio.Queue()
 
     async def disconnect(self) -> None:
         pass
@@ -54,9 +57,7 @@ async def test_redis():
 
 @pytest.mark.asyncio
 async def test_postgres():
-    async with Broadcast(
-        "postgres://postgres:postgres@localhost:5432/broadcaster"
-    ) as broadcast:
+    async with Broadcast("postgres://postgres:postgres@localhost:5432/broadcaster") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
@@ -95,7 +96,5 @@ async def test_unknown_backend():
 
 @pytest.mark.asyncio
 async def test_needs_url_or_backend():
-    with pytest.raises(
-        AssertionError, match="Either `url` or `backend` must be provided."
-    ):
+    with pytest.raises(AssertionError, match="Either `url` or `backend` must be provided."):
         Broadcast()
