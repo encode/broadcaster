@@ -35,6 +35,7 @@ dependencies = [
 redis = ["redis"]
 postgres = ["asyncpg"]
 kafka = ["aiokafka"]
+mqtt = ["aiomqtt"]
 test =  ["pytest", "pytest-asyncio"]
 
 [project.urls]
