@@ -51,14 +51,13 @@ jobs:
           POSTGRES_USER: postgres
         ports:
         - 5432:5432
-      mqtt:
-        image: "eclipse-mosquitto"
-        ports:
-          - 1883:1883
-        volumes:
-          - ./docker/mqtt/mosquitto-no-auth.conf:/mosquitto/config/mosquitto.conf
 
     steps:
+        # eclipse-mosquitto does not support configuration via environment variables
+        # so it is not possible to use github's service feature to start the broker
+        # instead, we start the broker using docker run command and stop it at the end of the job
+      - name: "Start MQTT broker"
+        run: "docker run -d -p 1883:1883 --name mqtt eclipse-mosquitto:2.0-openssl mosquitto -c /mosquitto-no-auth.conf"
       - uses: "actions/checkout@v2"
       - uses: "actions/setup-python@v2"
         with:
@@ -69,7 +68,13 @@ jobs:
         run: "scripts/check"
       - name: "Build package & docs"
         run: "scripts/build"
+
+
       - name: "Run tests"
         run: "scripts/test"
       - name: "Enforce coverage"
         run: "scripts/coverage"
+
+      - name: "Stop MQTT broker"
+        if: always()
+        run: "docker stop mqtt"
