@@ -38,6 +38,11 @@ class Broadcast:
 
             return RedisBackend(url)
 
+        elif parsed_url.scheme == "redis-stream":
+            from broadcaster._backends.redis import RedisStreamBackend
+
+            return RedisStreamBackend(url)
+
         elif parsed_url.scheme in ("postgres", "postgresql"):
             from broadcaster._backends.postgres import PostgresBackend
 
@@ -88,7 +93,7 @@ class Broadcast:
         try:
             if not self._subscribers.get(channel):
                 await self._backend.subscribe(channel)
-                self._subscribers[channel] = set([queue])
+                self._subscribers[channel] = {queue}
             else:
                 self._subscribers[channel].add(queue)
 
