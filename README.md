@@ -102,7 +102,6 @@ class MyBackend(BroadcastBackend):
 broadcaster = Broadcaster(backend=MyBackend())
 ```
 
-
 ## Where next?
 
 At the moment `broadcaster` is in Alpha, and should be considered a working design document.
