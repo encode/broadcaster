@@ -55,7 +55,8 @@ jobs:
         image: "eclipse-mosquitto"
         ports:
           - 1883:1883
-        options: --hostname mqtt mosquitto -c /mosquitto-no-auth.conf
+        volumes:
+          - ./docker/mqtt/mosquitto-no-auth.conf:/mosquitto/config/mosquitto.conf
 
     steps:
       - uses: "actions/checkout@v2"
