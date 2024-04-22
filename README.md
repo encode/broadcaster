@@ -3,7 +3,7 @@
 Broadcaster helps you develop realtime streaming functionality by providing
 a simple broadcast API onto a number of different backend services.
 
-It currently supports [Redis PUB/SUB](https://redis.io/topics/pubsub), [Apache Kafka](https://kafka.apache.org/), and [Postgres LISTEN/NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html), plus a simple in-memory backend, that you can use for local development or during testing.
+It currently supports [Redis PUB/SUB](https://redis.io/topics/pubsub), [Redis Streams](https://redis.io/docs/latest/develop/data-types/streams/), [Apache Kafka](https://kafka.apache.org/), and [Postgres LISTEN/NOTIFY](https://www.postgresql.org/docs/current/sql-notify.html), plus a simple in-memory backend, that you can use for local development or during testing.
 
 <img src="https://raw.githubusercontent.com/encode/broadcaster/master/docs/demo.gif" alt='WebSockets Demo'>
 
@@ -98,9 +98,10 @@ and pass it to the `broadcaster` via `backend` argument.
 from broadcaster import Broadcaster, BroadcastBackend
 
 class MyBackend(BroadcastBackend):
-    ...
 
 broadcaster = Broadcaster(backend=MyBackend())
+```
+
 
 ## Where next?
 
@@ -112,6 +113,6 @@ state, make sure to strictly pin your requirements to `broadcaster==0.2.0`.
 To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
 
 * Serialization / deserialization to support broadcasting structured data.
-* Backends for Apache Kafka, and RabbitMQ.
+* A backend for RabbitMQ.
 * Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
 * Support for pattern subscribes in backends that support it.
