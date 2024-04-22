@@ -100,6 +100,7 @@ class MyBackend(BroadcastBackend):
     ...
 
 broadcaster = Broadcaster(backend=MyBackend())
+```
 
 ## Where next?
 
