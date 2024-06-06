@@ -90,7 +90,7 @@ Python 3.8+
 ### Using custom backends
 
 You can create your own backend and use it with `broadcaster`.
-To do that you need to create a class which extends from `BroadcastBackend` 
+To do that you need to create a class which extends from `BroadcastBackend`
 and pass it to the `broadcaster` via `backend` argument.
 
 ```python
@@ -114,3 +114,10 @@ To be more capable we'd really want to add some additional backends, provide API
 * Backends for Redis Streams, Apache Kafka, and RabbitMQ.
 * Add support for `subscribe('chatroom', history=100)` for backends which provide persistence. (Redis Streams, Apache Kafka) This will allow applications to subscribe to channel updates, while also being given an initial window onto the most recent events. We *might* also want to support some basic paging operations, to allow applications to scan back in the event history.
 * Support for pattern subscribes in backends that support it.
+
+## Third Party Packages
+
+### MQTT backend
+[Gist](https://gist.github.com/alex-oleshkevich/68411a0e7ad24d53afd28c3fa5da468c)
+
+Integrates MQTT with Broadcaster
