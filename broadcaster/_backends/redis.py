@@ -15,15 +15,17 @@ class RedisBackend(BroadcastBackend):
         self._pubsub = self._conn.pubsub()
         self._ready = asyncio.Event()
         self._queue: asyncio.Queue[Event] = asyncio.Queue()
-        self._listener = asyncio.create_task(self._pubsub_listener())
+        self._listener: asyncio.Task[None] | None = None
 
     async def connect(self) -> None:
+        self._listener = asyncio.create_task(self._pubsub_listener())
         await self._pubsub.connect()
 
     async def disconnect(self) -> None:
         await self._pubsub.aclose()
         await self._conn.aclose()
-        self._listener.cancel()
+        if self._listener is not None:
+            self._listener.cancel()
 
     async def subscribe(self, channel: str) -> None:
         self._ready.set()
