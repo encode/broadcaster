@@ -6,6 +6,7 @@ import typing
 import pytest
 
 from broadcaster import Broadcast, BroadcastBackend, Event
+from broadcaster._backends.kafka import KafkaBackend
 
 
 class CustomBackend(BroadcastBackend):
@@ -80,10 +81,19 @@ async def test_postgres():
             assert event.message == "hello"
 
 
-@pytest.mark.skip("Deadlock on `next_published`")
 @pytest.mark.asyncio
 async def test_kafka():
     async with Broadcast("kafka://localhost:9092") as broadcast:
+        async with broadcast.subscribe("chatroom") as subscriber:
+            await broadcast.publish("chatroom", "hello")
+            event = await subscriber.get()
+            assert event.channel == "chatroom"
+            assert event.message == "hello"
+
+
+@pytest.mark.asyncio
+async def test_kafka_multiple_urls():
+    async with Broadcast(backend=KafkaBackend(urls=["kafka://localhost:9092", "kafka://localhost:9092"])) as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
             event = await subscriber.get()
