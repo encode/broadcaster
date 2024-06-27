@@ -107,7 +107,7 @@ broadcaster = Broadcaster(backend=MyBackend())
 At the moment `broadcaster` is in Alpha, and should be considered a working design document.
 
 The API should be considered subject to change. If you *do* want to use Broadcaster in its current
-state, make sure to strictly pin your requirements to `broadcaster==0.2.0`.
+state, make sure to strictly pin your requirements to `broadcaster==0.3.0`.
 
 To be more capable we'd really want to add some additional backends, provide API support for reading recent event history from persistent stores, and provide a serialization/deserialization API...
 
