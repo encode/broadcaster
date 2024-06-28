@@ -30,8 +30,11 @@ class RedisBackend(BroadcastBackend):
     async def subscribe(self, channel: str) -> None:
         self._ready.set()
         await self._pubsub.subscribe(channel)
+        if self._listener.done():
+            self._listener = asyncio.create_task(self._pubsub_listener())
 
     async def unsubscribe(self, channel: str) -> None:
+        self._ready.clear()
         await self._pubsub.unsubscribe(channel)
 
     async def publish(self, channel: str, message: typing.Any) -> None:
