@@ -55,7 +55,7 @@ class RedisBackend(BroadcastBackend):
 
             # when no channel subscribed, clear the event.
             # And then in next loop, event will blocked again until
-            # the new channel subscribed.Now asyncio.Task exited again.
+            # the new channel subscribed.Now asyncio.Task will not exit again.
             self._ready.clear()
 
 
