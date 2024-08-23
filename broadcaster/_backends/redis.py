@@ -65,7 +65,7 @@ StreamMessageType = typing.Tuple[bytes, typing.Tuple[typing.Tuple[bytes, typing.
 class RedisStreamBackend(BroadcastBackend):
     def __init__(self, url: str):
         url = url.replace("redis-stream", "redis", 1)
-        self.streams: dict[str, str] = {}
+        self.streams: dict[bytes | str | memoryview, int | bytes | str | memoryview] = {}
         self._ready = asyncio.Event()
         self._producer = redis.Redis.from_url(url)
         self._consumer = redis.Redis.from_url(url)
