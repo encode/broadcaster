@@ -110,7 +110,7 @@ class Subscriber:
     def __init__(self, queue: asyncio.Queue[Event | None]) -> None:
         self._queue = queue
 
-    async def __aiter__(self) -> AsyncGenerator[Event | None, None] | None:
+    async def __aiter__(self) -> AsyncGenerator[Event | None, None]:
         try:
             while True:
                 yield await self.get()
