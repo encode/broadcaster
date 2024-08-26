@@ -72,6 +72,21 @@ async def test_redis_stream():
 
 
 @pytest.mark.asyncio
+async def test_redis_resubscription():
+    async with Broadcast("redis://localhost:6379") as broadcast:
+        async with broadcast.subscribe("chatroom") as subscriber:
+            await broadcast.publish("chatroom", "hello")
+            event = await subscriber.get()
+            assert event.channel == "chatroom"
+
+        await asyncio.sleep(0)
+        async with broadcast.subscribe("chatroom2") as subscriber:
+            await broadcast.publish("chatroom2", "hello")
+            event = await subscriber.get()
+            assert event.channel == "chatroom2"
+
+
+@pytest.mark.asyncio
 async def test_postgres():
     async with Broadcast("postgres://postgres:postgres@localhost:5432/broadcaster") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
