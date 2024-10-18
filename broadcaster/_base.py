@@ -29,7 +29,7 @@ class Broadcast:
     def __init__(self, url: str | None = None, *, backend: BroadcastBackend | None = None) -> None:
         assert url or backend, "Either `url` or `backend` must be provided."
         self._backend = backend or self._create_backend(cast(str, url))
-        self._subscribers: dict[str, set[asyncio.Queue[Event | None]]] = {}
+        self._subscribers: dict[str, set[asyncio.Queue[Event | BaseException | None]]] = {}
 
     def _create_backend(self, url: str) -> BroadcastBackend:
         parsed_url = urlparse(url)
@@ -69,10 +69,19 @@ class Broadcast:
     async def connect(self) -> None:
         await self._backend.connect()
         self._listener_task = asyncio.create_task(self._listener())
+        self._listener_task.add_done_callback(self.drop)
+
+    def drop(self, task: asyncio.Task[None]) -> None:
+        exc = task.exception()
+        for queues in self._subscribers.values():
+            for queue in queues:
+                queue.put_nowait(exc)
 
     async def disconnect(self) -> None:
         if self._listener_task.done():
-            self._listener_task.result()
+            exc = self._listener_task.exception()
+            if exc is None:
+                self._listener_task.result()
         else:
             self._listener_task.cancel()
         await self._backend.disconnect()
@@ -88,7 +97,7 @@ class Broadcast:
 
     @asynccontextmanager
     async def subscribe(self, channel: str) -> AsyncIterator[Subscriber]:
-        queue: asyncio.Queue[Event | None] = asyncio.Queue()
+        queue: asyncio.Queue[Event | BaseException | None] = asyncio.Queue()
 
         try:
             if not self._subscribers.get(channel):
@@ -107,7 +116,7 @@ class Broadcast:
 
 
 class Subscriber:
-    def __init__(self, queue: asyncio.Queue[Event | None]) -> None:
+    def __init__(self, queue: asyncio.Queue[Event | BaseException | None]) -> None:
         self._queue = queue
 
     async def __aiter__(self) -> AsyncGenerator[Event | None, None]:
@@ -119,6 +128,8 @@ class Subscriber:
 
     async def get(self) -> Event:
         item = await self._queue.get()
+        if isinstance(item, BaseException):
+            raise item
         if item is None:
             raise Unsubscribed()
         return item

@@ -4,6 +4,7 @@ import asyncio
 import typing
 
 import pytest
+import redis
 
 from broadcaster import Broadcast, BroadcastBackend, Event
 from broadcaster.backends.kafka import KafkaBackend
@@ -54,6 +55,22 @@ async def test_redis():
             event = await subscriber.get()
             assert event.channel == "chatroom"
             assert event.message == "hello"
+
+
+@pytest.mark.asyncio
+async def test_redis_disconnect():
+    with pytest.raises(redis.ConnectionError) as exc:
+        async with Broadcast("redis://localhost:6379") as broadcast:
+            async with broadcast.subscribe("chatroom") as subscriber:
+                await broadcast.publish("chatroom", "hello")
+                await broadcast._backend._conn.connection_pool.aclose()  # type: ignore[attr-defined]
+                event = await subscriber.get()
+                assert event.channel == "chatroom"
+                assert event.message == "hello"
+                await subscriber.get()
+                assert False
+
+    assert exc.value.args == ("Connection closed by server.",)
 
 
 @pytest.mark.asyncio
