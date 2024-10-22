@@ -6,7 +6,7 @@ import typing
 import pytest
 
 from broadcaster import Broadcast, BroadcastBackend, Event
-from broadcaster._backends.kafka import KafkaBackend
+from broadcaster.backends.kafka import KafkaBackend
 
 
 class CustomBackend(BroadcastBackend):

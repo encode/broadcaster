@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, AsyncGenerator, AsyncIterator, cast
 from urllib.parse import urlparse
 
 if TYPE_CHECKING:  # pragma: no cover
-    from broadcaster._backends.base import BroadcastBackend
+    from broadcaster.backends.base import BroadcastBackend
 
 
 class Event:
@@ -34,27 +34,27 @@ class Broadcast:
     def _create_backend(self, url: str) -> BroadcastBackend:
         parsed_url = urlparse(url)
         if parsed_url.scheme in ("redis", "rediss"):
-            from broadcaster._backends.redis import RedisBackend
+            from broadcaster.backends.redis import RedisBackend
 
             return RedisBackend(url)
 
         elif parsed_url.scheme == "redis-stream":
-            from broadcaster._backends.redis import RedisStreamBackend
+            from broadcaster.backends.redis import RedisStreamBackend
 
             return RedisStreamBackend(url)
 
         elif parsed_url.scheme in ("postgres", "postgresql"):
-            from broadcaster._backends.postgres import PostgresBackend
+            from broadcaster.backends.postgres import PostgresBackend
 
             return PostgresBackend(url)
 
         if parsed_url.scheme == "kafka":
-            from broadcaster._backends.kafka import KafkaBackend
+            from broadcaster.backends.kafka import KafkaBackend
 
             return KafkaBackend(url)
 
         elif parsed_url.scheme == "memory":
-            from broadcaster._backends.memory import MemoryBackend
+            from broadcaster.backends.memory import MemoryBackend
 
             return MemoryBackend(url)
         raise ValueError(f"Unsupported backend: {parsed_url.scheme}")
