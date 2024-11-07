@@ -72,10 +72,14 @@ class Broadcast:
         self._listener_task.add_done_callback(self.drop)
 
     def drop(self, task: asyncio.Task[None]) -> None:
-        exc = task.exception()
-        for queues in self._subscribers.values():
-            for queue in queues:
-                queue.put_nowait(exc)
+        try:
+            exc = task.exception()
+        except asyncio.CancelledError:
+            pass
+        else:
+            for queues in self._subscribers.values():
+                for queue in queues:
+                    queue.put_nowait(exc)
 
     async def disconnect(self) -> None:
         if self._listener_task.done():

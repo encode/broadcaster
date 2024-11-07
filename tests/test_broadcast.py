@@ -58,7 +58,7 @@ async def test_redis():
 
 
 @pytest.mark.asyncio
-async def test_redis_disconnect():
+async def test_redis_server_disconnect():
     with pytest.raises(redis.ConnectionError) as exc:
         async with Broadcast("redis://localhost:6379") as broadcast:
             async with broadcast.subscribe("chatroom") as subscriber:
@@ -71,6 +71,18 @@ async def test_redis_disconnect():
                 assert False
 
     assert exc.value.args == ("Connection closed by server.",)
+
+
+@pytest.mark.asyncio
+async def test_redis_does_not_log_loop_error_messages(caplog):
+    async with Broadcast("redis://localhost:6379") as broadcast:
+        async with broadcast.subscribe("chatroom") as subscriber:
+            await broadcast.publish("chatroom", "hello")
+            event = await subscriber.get()
+            assert event.channel == "chatroom"
+            assert event.message == "hello"
+
+    assert caplog.messages == []
 
 
 @pytest.mark.asyncio
