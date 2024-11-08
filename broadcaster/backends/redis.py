@@ -10,8 +10,15 @@ from .base import BroadcastBackend
 
 
 class RedisBackend(BroadcastBackend):
-    def __init__(self, url: str):
-        self._conn = redis.Redis.from_url(url)
+    _conn: redis.Redis
+
+    def __init__(self, url: str | None = None, *, conn: redis.Redis | None = None):
+        if url is None:
+            assert conn is not None, "conn must be provided if url is not"
+            self._conn = conn
+        else:
+            self._conn = redis.Redis.from_url(url)
+
         self._pubsub = self._conn.pubsub()
         self._ready = asyncio.Event()
         self._queue: asyncio.Queue[Event] = asyncio.Queue()
@@ -19,10 +26,10 @@ class RedisBackend(BroadcastBackend):
 
     async def connect(self) -> None:
         self._listener = asyncio.create_task(self._pubsub_listener())
-        await self._pubsub.connect()
+        await self._pubsub.connect()  # type: ignore[no-untyped-call]
 
     async def disconnect(self) -> None:
-        await self._pubsub.aclose()
+        await self._pubsub.aclose()  # type: ignore[no-untyped-call]
         await self._conn.aclose()
         if self._listener is not None:
             self._listener.cancel()

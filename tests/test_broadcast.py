@@ -4,9 +4,11 @@ import asyncio
 import typing
 
 import pytest
+from redis import asyncio as redis
 
 from broadcaster import Broadcast, BroadcastBackend, Event
 from broadcaster.backends.kafka import KafkaBackend
+from broadcaster.backends.redis import RedisBackend
 
 
 class CustomBackend(BroadcastBackend):
@@ -54,6 +56,23 @@ async def test_redis():
             event = await subscriber.get()
             assert event.channel == "chatroom"
             assert event.message == "hello"
+
+
+@pytest.mark.asyncio
+async def test_redis_configured_client():
+    backend = RedisBackend(conn=redis.Redis.from_url("redis://localhost:6379"))
+    async with Broadcast(backend=backend) as broadcast:
+        async with broadcast.subscribe("chatroom") as subscriber:
+            await broadcast.publish("chatroom", "hello")
+            event = await subscriber.get()
+            assert event.channel == "chatroom"
+            assert event.message == "hello"
+
+
+@pytest.mark.asyncio
+async def test_redis_requires_url_or_connection():
+    with pytest.raises(AssertionError, match="conn must be provided if url is not"):
+        RedisBackend()
 
 
 @pytest.mark.asyncio
