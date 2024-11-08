@@ -14,11 +14,12 @@ class RedisBackend(BroadcastBackend):
         self._conn = redis.Redis.from_url(url)
         self._pubsub = self._conn.pubsub()
         self._ready = asyncio.Event()
-        self._queue: asyncio.Queue[Event] = asyncio.Queue()
+        self._queue: asyncio.Queue[Event | BaseException | None] = asyncio.Queue()
         self._listener: asyncio.Task[None] | None = None
 
     async def connect(self) -> None:
         self._listener = asyncio.create_task(self._pubsub_listener())
+        self._listener.add_done_callback(self.drop)
         await self._pubsub.connect()
 
     async def disconnect(self) -> None:
@@ -26,6 +27,14 @@ class RedisBackend(BroadcastBackend):
         await self._conn.aclose()
         if self._listener is not None:
             self._listener.cancel()
+
+    def drop(self, task: asyncio.Task[None]) -> None:
+        try:
+            exc = task.exception()
+        except asyncio.CancelledError:
+            pass
+        else:
+            self._queue.put_nowait(exc)
 
     async def subscribe(self, channel: str) -> None:
         self._ready.set()
@@ -38,7 +47,12 @@ class RedisBackend(BroadcastBackend):
         await self._conn.publish(channel, message)
 
     async def next_published(self) -> Event:
-        return await self._queue.get()
+        result = await self._queue.get()
+        if result is None:
+            raise RuntimeError
+        if isinstance(result, BaseException):
+            raise result
+        return result
 
     async def _pubsub_listener(self) -> None:
         # redis-py does not listen to the pubsub connection if there are no channels subscribed
