@@ -74,7 +74,7 @@ async def test_redis_server_disconnect():
 
 
 @pytest.mark.asyncio
-async def test_redis_does_not_log_loop_error_messages(caplog):
+async def test_redis_does_not_log_loop_error_messages_if_subscribing(caplog):
     async with Broadcast("redis://localhost:6379") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
             await broadcast.publish("chatroom", "hello")
@@ -82,6 +82,17 @@ async def test_redis_does_not_log_loop_error_messages(caplog):
             assert event.channel == "chatroom"
             assert event.message == "hello"
 
+    assert caplog.messages == []
+
+
+@pytest.mark.asyncio
+async def test_redis_does_not_log_loop_error_messages_if_not_subscribing(caplog):
+    async with Broadcast("redis://localhost:6379") as broadcast:
+        await broadcast.publish("chatroom", "hello")
+
+    # Give the loop an opportunity to catch any errors before checking
+    # the logs.
+    await asyncio.sleep(0.1)
     assert caplog.messages == []
 
 

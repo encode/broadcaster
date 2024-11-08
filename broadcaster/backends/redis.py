@@ -29,8 +29,12 @@ class RedisBackend(BroadcastBackend):
             self._listener.cancel()
 
     def drop(self, task: asyncio.Task[None]) -> None:
-        exc = task.exception()
-        self._queue.put_nowait(exc)
+        try:
+            exc = task.exception()
+        except asyncio.CancelledError:
+            pass
+        else:
+            self._queue.put_nowait(exc)
 
     async def subscribe(self, channel: str) -> None:
         self._ready.set()
