@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import typing
 
-from .._base import Event
+from .._event import Event
 from .base import BroadcastBackend
 
 

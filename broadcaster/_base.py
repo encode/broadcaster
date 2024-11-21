@@ -5,20 +5,12 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any, AsyncGenerator, AsyncIterator, cast
 from urllib.parse import urlparse
 
+from broadcaster.backends.base import BroadcastCacheBackend
+
+from ._event import Event
+
 if TYPE_CHECKING:  # pragma: no cover
     from broadcaster.backends.base import BroadcastBackend
-
-
-class Event:
-    def __init__(self, channel: str, message: str) -> None:
-        self.channel = channel
-        self.message = message
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, Event) and self.channel == other.channel and self.message == other.message
-
-    def __repr__(self) -> str:
-        return f"Event(channel={self.channel!r}, message={self.message!r})"
 
 
 class Unsubscribed(Exception):
@@ -42,6 +34,11 @@ class Broadcast:
             from broadcaster.backends.redis import RedisStreamBackend
 
             return RedisStreamBackend(url)
+
+        elif parsed_url.scheme == "redis-stream-cached":
+            from broadcaster.backends.redis import RedisStreamCachedBackend
+
+            return RedisStreamCachedBackend(url)
 
         elif parsed_url.scheme in ("postgres", "postgresql"):
             from broadcaster.backends.postgres import PostgresBackend
@@ -87,7 +84,7 @@ class Broadcast:
         await self._backend.publish(channel, message)
 
     @asynccontextmanager
-    async def subscribe(self, channel: str) -> AsyncIterator[Subscriber]:
+    async def subscribe(self, channel: str, history: int | None = None) -> AsyncIterator[Subscriber]:
         queue: asyncio.Queue[Event | None] = asyncio.Queue()
 
         try:
@@ -95,7 +92,20 @@ class Broadcast:
                 await self._backend.subscribe(channel)
                 self._subscribers[channel] = {queue}
             else:
-                self._subscribers[channel].add(queue)
+                if isinstance(self._backend, BroadcastCacheBackend):
+                    try:
+                        current_id = await self._backend.get_current_channel_id(channel)
+                        self._backend._ready.clear()
+                        messages = await self._backend.get_history_messages(channel, current_id, history)
+                        for message in messages:
+                            queue.put_nowait(message)
+                        self._subscribers[channel].add(queue)
+                    finally:
+                        # wake up the listener after inqueue history messages
+                        # for sorted messages by publish time
+                        self._backend._ready.set()
+                else:
+                    self._subscribers[channel].add(queue)
 
             yield Subscriber(queue)
         finally:
