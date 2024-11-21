@@ -169,7 +169,7 @@ class RedisStreamCachedBackend(BroadcastCacheBackend):
     async def get_current_channel_id(self, channel: str) -> int | bytes | str | memoryview:
         try:
             info = await self._consumer.xinfo_stream(channel)
-            last_id: int = info["last-generated-id"]
+            last_id: int | bytes | str | memoryview = info["last-generated-id"]
         except redis.ResponseError:
             last_id = "0"
         return last_id
