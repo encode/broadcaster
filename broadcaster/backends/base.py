@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from .._event import Event
@@ -29,6 +30,8 @@ class BroadcastBackend:
 
 
 class BroadcastCacheBackend(BroadcastBackend):
+    _ready: asyncio.Event
+
     async def get_current_channel_id(self, channel: str):
         raise NotImplementedError()
 
