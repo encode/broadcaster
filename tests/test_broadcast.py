@@ -81,15 +81,17 @@ async def test_redis_stream_cache():
         sub1_messages = []
         async with broadcast.subscribe("chatroom_cached") as subscriber:
             async for event in subscriber:
-                if event.message == "quit":
-                    break
-                sub1_messages.append(event.message)
+                if event:
+                    if event.message == "quit":
+                        break
+                    sub1_messages.append(event.message)
         sub2_messages = []
         async with broadcast.subscribe("chatroom_cached") as subscriber:
             async for event in subscriber:
-                if event.message == "quit":
-                    break
-                sub2_messages.append(event.message)
+                if event:
+                    if event.message == "quit":
+                        break
+                    sub2_messages.append(event.message)
 
         assert sub1_messages == sub2_messages == messages
 

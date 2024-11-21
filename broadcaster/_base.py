@@ -96,8 +96,7 @@ class Broadcast:
                     try:
                         current_id = await self._backend.get_current_channel_id(channel)
                         self._backend._ready.clear()
-                        messages = await self._backend.get_history_messages(channel, current_id, history)
-                        for message in messages:
+                        async for message in self._backend.get_history_messages(channel, current_id, history):
                             queue.put_nowait(message)
                         self._subscribers[channel].add(queue)
                     finally:
