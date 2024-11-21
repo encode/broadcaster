@@ -32,7 +32,7 @@ class BroadcastBackend:
 class BroadcastCacheBackend(BroadcastBackend):
     _ready: asyncio.Event
 
-    async def get_current_channel_id(self, channel: str):
+    async def get_current_channel_id(self, channel: str) -> str | bytes | memoryview | int:
         raise NotImplementedError()
 
     async def get_history_messages(
