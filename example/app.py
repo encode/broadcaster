@@ -1,7 +1,5 @@
-from __future__ import annotations
-
 import os
-from pathlib import Path
+
 
 import anyio
 from starlette.applications import Starlette
@@ -12,9 +10,8 @@ from broadcaster import Broadcast
 
 BROADCAST_URL = os.environ.get("BROADCAST_URL", "memory://")
 
-templates_dir = Path(__file__).parent / "templates"
-broadcast = Broadcast("redis-stream-cached://localhost:6379/8")
-templates = Jinja2Templates(templates_dir)
+broadcast = Broadcast(BROADCAST_URL)
+templates = Jinja2Templates("example/templates")
 
 
 async def homepage(request):
@@ -58,9 +55,3 @@ app = Starlette(
     on_startup=[broadcast.connect],
     on_shutdown=[broadcast.disconnect],
 )
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=7777)

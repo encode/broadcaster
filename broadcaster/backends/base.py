@@ -1,45 +1,41 @@
 from __future__ import annotations
 
-import asyncio
-from abc import ABC, abstractmethod
 from typing import Any
 
 from .._event import Event
 
 
-class BroadcastBackend(ABC):
-    @abstractmethod
-    def __init__(self, url: str) -> None: ...
+class BroadcastBackend:
+    def __init__(self, url: str) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def connect(self) -> None: ...
+    async def connect(self) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def disconnect(self) -> None: ...
+    async def disconnect(self) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def subscribe(self, channel: str) -> None: ...
+    async def subscribe(self, channel: str) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def unsubscribe(self, channel: str) -> None: ...
+    async def unsubscribe(self, channel: str) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def publish(self, channel: str, message: Any) -> None: ...
+    async def publish(self, channel: str, message: Any) -> None:
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def next_published(self) -> Event: ...
+    async def next_published(self) -> Event:
+        raise NotImplementedError()
 
 
 class BroadcastCacheBackend(BroadcastBackend):
-    _ready: asyncio.Event
+    async def get_current_channel_id(self, channel: str):
+        raise NotImplementedError()
 
-    @abstractmethod
-    async def get_current_channel_id(self, channel: str) -> str | bytes | memoryview | int: ...
-
-    @abstractmethod
     async def get_history_messages(
         self,
         channel: str,
         msg_id: int | bytes | str | memoryview,
         count: int | None = None,
-    ) -> list[Event]: ...
+    ) -> list[Event]:
+        raise NotImplementedError()
