@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Any, AsyncGenerator
+from typing import Any
 
 from .._event import Event
 
