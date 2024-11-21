@@ -169,7 +169,7 @@ class RedisStreamCachedBackend(BroadcastCacheBackend):
     async def get_current_channel_id(self, channel: str) -> int | bytes | str | memoryview:
         try:
             info = await self._consumer.xinfo_stream(channel)
-            last_id = info["last-generated-id"]
+            last_id: int = info["last-generated-id"]
         except redis.ResponseError:
             last_id = "0"
         return last_id
@@ -179,10 +179,12 @@ class RedisStreamCachedBackend(BroadcastCacheBackend):
         channel: str,
         msg_id: int | bytes | str | memoryview,
         count: int | None = None,
-    ) -> typing.AsyncGenerator[Event, None]:
+    ) -> list[Event]:
         messages = await self._consumer.xrevrange(channel, max=msg_id, count=count)
-        for _, message in reversed(messages or []):
-            yield Event(
+        return [
+            Event(
                 channel=channel,
                 message=message.get(b"message", b"").decode("utf-8"),
             )
+            for _, message in reversed(messages or [])
+        ]
