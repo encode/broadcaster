@@ -5,8 +5,15 @@ import typing
 
 import pytest
 
+from pydantic import BaseModel
+
 from broadcaster import Broadcast, BroadcastBackend, Event
 from broadcaster.backends.kafka import KafkaBackend
+
+
+class PydanticEvent(BaseModel):
+    event: str
+    data: str
 
 
 class CustomBackend(BroadcastBackend):
@@ -69,6 +76,26 @@ async def test_redis_stream():
             event = await subscriber.get()
             assert event.channel == "chatroom1"
             assert event.message == "hello"
+
+
+@pytest.mark.asyncio
+async def test_redis_pydantic_stream():
+    async with Broadcast("redis-pydantic-stream://localhost:6379") as broadcast:
+        async with broadcast.subscribe("chatroom") as subscriber:
+            message = PydanticEvent(event="on_message", data="hello")
+            await broadcast.publish("chatroom", message)
+            event = await subscriber.get()
+            assert event.channel == "chatroom"
+            assert isinstance(event.message, PydanticEvent)
+            assert event.message.event == message.event
+            assert event.message.data == message.data
+        async with broadcast.subscribe("chatroom1") as subscriber:
+            await broadcast.publish("chatroom1", message)
+            event = await subscriber.get()
+            assert event.channel == "chatroom1"
+            assert isinstance(event.message, PydanticEvent)
+            assert event.message.event == message.event
+            assert event.message.data == message.data
 
 
 @pytest.mark.asyncio
