@@ -5,12 +5,14 @@ from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any, AsyncGenerator, AsyncIterator, cast
 from urllib.parse import urlparse
 
+from pydantic import BaseModel
+
 if TYPE_CHECKING:  # pragma: no cover
     from broadcaster.backends.base import BroadcastBackend
 
 
 class Event:
-    def __init__(self, channel: str, message: str) -> None:
+    def __init__(self, channel: str, message: str | BaseModel) -> None:
         self.channel = channel
         self.message = message
 
