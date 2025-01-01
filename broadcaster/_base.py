@@ -43,6 +43,11 @@ class Broadcast:
 
             return RedisStreamBackend(url)
 
+        elif parsed_url.scheme == "redis-pydantic-stream":
+            from broadcaster.backends.redis import RedisPydanticStreamBackend
+
+            return RedisPydanticStreamBackend(url)
+
         elif parsed_url.scheme in ("postgres", "postgresql"):
             from broadcaster.backends.postgres import PostgresBackend
 

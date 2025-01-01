@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import inspect
+import sys
 import typing
 
 from redis import asyncio as redis
+from pydantic import BaseModel
 
 from .._base import Event
 from .base import BroadcastBackend
@@ -107,4 +110,58 @@ class RedisStreamBackend(BroadcastBackend):
         return Event(
             channel=stream.decode("utf-8"),
             message=message.get(b"message", b"").decode("utf-8"),
+        )
+
+
+class RedisPydanticStreamBackend(RedisStreamBackend):
+    """Redis Stream backend for broadcasting messages using Pydantic models."""
+
+    def __init__(self: typing.Self, url: str) -> None:
+        """Create a new Redis Stream backend."""
+        url = url.replace("redis-pydantic-stream", "redis", 1)
+        self.streams: dict[bytes | str | memoryview, int | bytes | str | memoryview] = {}
+        self._ready = asyncio.Event()
+        self._producer = redis.Redis.from_url(url)
+        self._consumer = redis.Redis.from_url(url)
+        self._module_cache: dict[str, type(BaseModel)] = {}
+
+    def _build_module_cache(self: typing.Self) -> None:
+        """Build a cache of Pydantic models."""
+        modules = list(sys.modules.keys())
+        for module_name in modules:
+            for _, obj in inspect.getmembers(sys.modules[module_name]):
+                if inspect.isclass(obj) and issubclass(obj, BaseModel):
+                    self._module_cache[obj.__name__] = obj
+
+    async def publish(self: typing.Self, channel: str, message: BaseModel) -> None:
+        """Publish a message to a channel."""
+        msg_type: str = message.__class__.__name__
+        message_json: str = message.model_dump_json()
+        await self._producer.xadd(channel, {"msg_type": msg_type, "message": message_json})
+
+    async def wait_for_messages(self: typing.Self) -> list[StreamMessageType]:
+        """Wait for messages to be published."""
+        await self._ready.wait()
+        self._build_module_cache()
+        messages = None
+        while not messages:
+            messages = await self._consumer.xread(self.streams, count=1, block=100)
+        return messages
+
+    async def next_published(self: typing.Self) -> Event | None:
+        """Get the next published message."""
+        messages = await self.wait_for_messages()
+        stream, events = messages[0]
+        _msg_id, message = events[0]
+        self.streams[stream.decode("utf-8")] = _msg_id.decode("utf-8")
+        msg_type = message.get(b"msg_type", b"").decode("utf-8")
+        message_data = message.get(b"message", b"").decode("utf-8")
+        message_obj: BaseModel | None = None
+        if msg_type in self._module_cache:
+            message_obj = self._module_cache[msg_type].model_validate_json(message_data)
+        if not message_obj:
+            return None
+        return Event(
+            channel=stream.decode("utf-8"),
+            message=message_obj,
         )

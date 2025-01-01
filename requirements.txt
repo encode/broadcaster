@@ -1,4 +1,4 @@
--e .[redis,postgres,kafka]
+-e .[redis,postgres,kafka,pydantic]
 
 # Documentation
 mkdocs==1.5.3
