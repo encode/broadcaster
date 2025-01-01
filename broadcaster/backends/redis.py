@@ -5,8 +5,8 @@ import inspect
 import sys
 import typing
 
-from redis import asyncio as redis
 from pydantic import BaseModel
+from redis import asyncio as redis
 
 from .._base import Event
 from .base import BroadcastBackend

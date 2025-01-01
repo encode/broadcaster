@@ -4,7 +4,6 @@ import asyncio
 import typing
 
 import pytest
-
 from pydantic import BaseModel
 
 from broadcaster import Broadcast, BroadcastBackend, Event
