@@ -3,7 +3,7 @@ from typing import Any
 
 import asyncpg
 
-from .._base import Event
+from .._event import Event
 from .base import BroadcastBackend
 
 

@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
-from .._base import Event
+from .._event import Event
 from .base import BroadcastBackend
 
 
