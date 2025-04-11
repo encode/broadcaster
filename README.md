@@ -84,6 +84,7 @@ Python 3.8+
 * `Broadcast('memory://')`
 * `Broadcast("redis://localhost:6379")`
 * `Broadcast("redis-stream://localhost:6379")`
+* `Broadcast("redis-stream-cached://localhost:6379")`
 * `Broadcast("postgres://localhost:5432/broadcaster")`
 * `Broadcast("kafka://localhost:9092")`
 

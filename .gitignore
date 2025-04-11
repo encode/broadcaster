@@ -7,3 +7,5 @@ test.db
 venv/
 build/
 dist/
+.idea/
+.vscode/

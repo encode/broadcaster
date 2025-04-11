@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+import asyncio
 from typing import Any
 
-from .._base import Event
+from .._event import Event
 
 
 class BroadcastBackend:
@@ -23,4 +26,19 @@ class BroadcastBackend:
         raise NotImplementedError()
 
     async def next_published(self) -> Event:
+        raise NotImplementedError()
+
+
+class BroadcastCacheBackend(BroadcastBackend):
+    _ready: asyncio.Event
+
+    async def get_current_channel_id(self, channel: str) -> str | bytes | memoryview | int:
+        raise NotImplementedError()
+
+    async def get_history_messages(
+        self,
+        channel: str,
+        msg_id: int | bytes | str | memoryview,
+        count: int | None = None,
+    ) -> list[Event]:
         raise NotImplementedError()

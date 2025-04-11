@@ -91,6 +91,31 @@ async def test_redis_stream():
 
 
 @pytest.mark.asyncio
+async def test_redis_stream_cache():
+    messages = ["hello", "I'm cached"]
+    async with Broadcast("redis-stream-cached://localhost:6379") as broadcast:
+        await broadcast.publish("chatroom_cached", messages[0])
+        await broadcast.publish("chatroom_cached", messages[1])
+        await broadcast.publish("chatroom_cached", "quit")
+        sub1_messages = []
+        async with broadcast.subscribe("chatroom_cached") as subscriber:
+            async for event in subscriber:
+                if event:
+                    if event.message == "quit":
+                        break
+                    sub1_messages.append(event.message)
+        sub2_messages = []
+        async with broadcast.subscribe("chatroom_cached") as subscriber:
+            async for event in subscriber:
+                if event:
+                    if event.message == "quit":
+                        break
+                    sub2_messages.append(event.message)
+
+        assert sub1_messages == sub2_messages == messages
+
+
+@pytest.mark.asyncio
 async def test_postgres():
     async with Broadcast("postgres://postgres:postgres@localhost:5432/broadcaster") as broadcast:
         async with broadcast.subscribe("chatroom") as subscriber:
